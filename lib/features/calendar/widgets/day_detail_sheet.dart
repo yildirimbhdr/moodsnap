@@ -20,6 +20,7 @@ class DayDetailSheet extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final l10n = AppLocalizations.of(context);
+    final customMoodService = ref.read(customMoodServiceProvider);
     final monthNames = [
       l10n.january, l10n.february, l10n.march, l10n.april,
       l10n.may, l10n.june, l10n.july, l10n.august,
@@ -74,11 +75,11 @@ class DayDetailSheet extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: _getMoodColor(entry.mood).withOpacity(0.1),
+                color: EmojiConstants.getMoodColor(entry.mood, customMoodService: customMoodService).withOpacity(0.1),
                 shape: BoxShape.circle,
               ),
               child: Text(
-                EmojiConstants.getEmoji(entry.mood),
+                EmojiConstants.getEmoji(entry.mood, customMoodService: customMoodService),
                 style: const TextStyle(fontSize: 80),
               ),
             ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
@@ -89,17 +90,17 @@ class DayDetailSheet extends ConsumerWidget {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
               decoration: BoxDecoration(
-                color: _getMoodColor(entry.mood).withOpacity(0.15),
+                color: EmojiConstants.getMoodColor(entry.mood, customMoodService: customMoodService).withOpacity(0.15),
                 borderRadius: BorderRadius.circular(20),
                 border: Border.all(
-                  color: _getMoodColor(entry.mood).withOpacity(0.3),
+                  color: EmojiConstants.getMoodColor(entry.mood, customMoodService: customMoodService).withOpacity(0.3),
                   width: 1.5,
                 ),
               ),
               child: Text(
-                _getMoodLabel(entry.mood, l10n),
+                EmojiConstants.getLocalizedMood(entry.mood, l10n, customMoodService: customMoodService),
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: _getMoodColor(entry.mood),
+                      color: EmojiConstants.getMoodColor(entry.mood, customMoodService: customMoodService),
                       fontWeight: FontWeight.bold,
                     ),
               ),
@@ -365,42 +366,6 @@ class DayDetailSheet extends ConsumerWidget {
         ),
       ),
     );
-  }
-
-  String _getMoodLabel(String mood, AppLocalizations l10n) {
-    switch (mood) {
-      case 'happy':
-        return l10n.moodHappy;
-      case 'sad':
-        return l10n.moodSad;
-      case 'angry':
-        return l10n.moodAngry;
-      case 'anxious':
-        return l10n.moodAnxious;
-      case 'tired':
-        return l10n.moodTired;
-      case 'neutral':
-      default:
-        return l10n.moodNeutral;
-    }
-  }
-
-  Color _getMoodColor(String mood) {
-    switch (mood) {
-      case 'happy':
-        return AppColors.moodHappy;
-      case 'sad':
-        return AppColors.moodSad;
-      case 'angry':
-        return AppColors.moodAngry;
-      case 'anxious':
-        return AppColors.moodAnxious;
-      case 'tired':
-        return AppColors.moodTired;
-      case 'neutral':
-      default:
-        return AppColors.moodNeutral;
-    }
   }
 
   void _showDeleteDialog(BuildContext context, WidgetRef ref) {

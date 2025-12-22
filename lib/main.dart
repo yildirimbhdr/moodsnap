@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moodysnap/firebase_options.dart';
 import 'package:moodysnap/services/storage/storage_service.dart';
 import 'package:moodysnap/services/achievement_service.dart';
+import 'package:moodysnap/services/custom_mood_service.dart';
 import 'app.dart';
 
 void main() async {
@@ -17,6 +18,9 @@ void main() async {
 
   final achievementService = AchievementService();
   await achievementService.init();
+
+  final customMoodService = CustomMoodService();
+  await customMoodService.init();
 
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
@@ -37,6 +41,7 @@ void main() async {
       overrides: [
         storageServiceProvider.overrideWithValue(storageService),
         achievementServiceProvider.overrideWithValue(achievementService),
+        customMoodServiceProvider.overrideWithValue(customMoodService),
       ],
       child: const MoodSnapApp(),
     ),
@@ -49,4 +54,8 @@ final storageServiceProvider = Provider<StorageService>((ref) {
 
 final achievementServiceProvider = Provider<AchievementService>((ref) {
   throw UnimplementedError('AchievementService must be overridden');
+});
+
+final customMoodServiceProvider = Provider<CustomMoodService>((ref) {
+  throw UnimplementedError('CustomMoodService must be overridden');
 });

@@ -161,6 +161,39 @@ abstract class AppLocalizations {
   String get patterns;
   String get triggerDetected;
   String get basedOnEntries;
+
+  // Additional Home Screen
+  String get heyThere;
+  String get tapToTrackMood;
+
+  // Photo Options
+  String get addMomentFromDay;
+  String get takePhoto;
+  String get chooseFromGallery;
+
+  // Custom Moods
+  String get customMoods;
+  String get manageYourMoods;
+  String get createCustomMood;
+  String get editMood;
+  String get moodName;
+  String get moodEmoji;
+  String get moodColor;
+  String get selectEmoji;
+  String get selectColor;
+  String get create;
+  String get update;
+  String get deleteMood;
+  String get deleteMoodWarning;
+  String get cannotDeleteDefault;
+  String get noCustomMoods;
+  String get tapToCreateFirst;
+  String get defaultMoods;
+  String get customMoodsCount;
+  String get moodNameRequired;
+  String get moodEmojiRequired;
+  String get moodNameExists;
+  String get moodEmojiExists;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

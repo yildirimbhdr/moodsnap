@@ -7,7 +7,6 @@ import 'package:path/path.dart' as path;
 import 'package:path_provider/path_provider.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
-import '../../core/constants/emoji_constants.dart';
 import '../../core/constants/tag_constants.dart';
 import '../../core/utils/haptic_utils.dart';
 import '../../data/models/mood_entry.dart';
@@ -76,6 +75,7 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
     await HapticUtils.success();
 
     final storage = ref.read(storageServiceProvider);
+    final achievementService = ref.read(achievementServiceProvider);
 
     // If editing an existing entry, preserve its date
     final MoodEntry entry;
@@ -102,6 +102,62 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
     final streak = storage.getCurrentStreak();
     await storage.updateLongestStreak(streak);
     todayEntry = entry;
+
+    // Check for new achievements
+    final allEntries = storage.getAllMoodEntries();
+    final newAchievements = await achievementService.checkAchievements(
+      allEntries: allEntries,
+      currentStreak: streak,
+    );
+
+    if (!mounted) return;
+
+    // Show achievement notification if any new achievements unlocked
+    if (newAchievements.isNotEmpty && mounted) {
+      final l10n = AppLocalizations.of(context);
+      for (var achievement in newAchievements) {
+        if (!mounted) break;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                Text(
+                  achievement.emoji,
+                  style: const TextStyle(fontSize: 24),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        l10n.achievementsUnlocked,
+                        style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                      Text(
+                        achievement.title,
+                        style: const TextStyle(fontSize: 13),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            backgroundColor: AppColors.primary,
+            duration: const Duration(seconds: 3),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
+            ),
+          ),
+        );
+        await Future.delayed(const Duration(milliseconds: 500));
+      }
+    }
 
     if (!mounted) return;
     Navigator.pop(context, true);
@@ -334,64 +390,71 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
       textAlign: TextAlign.start,
     );
   }
-  Widget get emojies => Wrap(
-    spacing: 16,
-    runSpacing: 16,
-    alignment: WrapAlignment.center,
-    children: EmojiConstants.moods.entries.map((entry) {
-      final isSelected = _selectedMood == entry.key;
+  Widget get emojies {
+    final customMoodService = ref.read(customMoodServiceProvider);
+    final allMoods = customMoodService.getAllMoods();
 
-      return GestureDetector(
-        onTap: () async {
-          await HapticUtils.lightImpact();
-          setState(() {
-            _selectedMood = entry.key;
-          });
-        },
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          width: isSelected ? 85 : 75,
-          height: isSelected ? 85 : 75,
-          decoration: BoxDecoration(
-            gradient: isSelected
-                ? LinearGradient(
-                    colors: [
-                      AppColors.primary.withOpacity(0.15),
-                      AppColors.primary.withOpacity(0.08),
-                    ],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  )
-                : null,
-            color: isSelected ? null : AppColors.cardBackground,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: isSelected
-                  ? AppColors.primary
-                  : AppColors.textHint.withOpacity(0.2),
-              width: isSelected ? 3 : 1.5,
+    return Wrap(
+      spacing: 16,
+      runSpacing: 16,
+      alignment: WrapAlignment.center,
+      children: allMoods.map((mood) {
+        final isSelected = _selectedMood == mood.id;
+
+        final color = customMoodService.getMoodColor(mood.id);
+
+        return GestureDetector(
+          onTap: () async {
+            await HapticUtils.lightImpact();
+            setState(() {
+              _selectedMood = mood.id;
+            });
+          },
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            width: isSelected ? 85 : 75,
+            height: isSelected ? 85 : 75,
+            decoration: BoxDecoration(
+              gradient: isSelected
+                  ? LinearGradient(
+                      colors: [
+                        color.withOpacity(0.15),
+                        color.withOpacity(0.08),
+                      ],
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                    )
+                  : null,
+              color: isSelected ? null : AppColors.cardBackground,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(
+                color: isSelected
+                    ? color
+                    : AppColors.textHint.withOpacity(0.2),
+                width: isSelected ? 3 : 1.5,
+              ),
+              boxShadow: isSelected
+                  ? [
+                      BoxShadow(
+                        color: color.withOpacity(0.2),
+                        blurRadius: 12,
+                        offset: const Offset(0, 4),
+                      ),
+                    ]
+                  : [],
             ),
-            boxShadow: isSelected
-                ? [
-                    BoxShadow(
-                      color: AppColors.primary.withOpacity(0.2),
-                      blurRadius: 12,
-                      offset: const Offset(0, 4),
-                    ),
-                  ]
-                : [],
-          ),
-          child: Center(
-            child: Text(
-              entry.value,
-              style: TextStyle(fontSize: isSelected ? 48 : 40),
+            child: Center(
+              child: Text(
+                mood.emoji,
+                style: TextStyle(fontSize: isSelected ? 48 : 40),
+              ),
             ),
           ),
-        ),
-      );
-    }).toList(),
-  );
+        );
+      }).toList(),
+    );
+  }
   Widget note(l10n) => Container(
     decoration: BoxDecoration(
       color: AppColors.cardBackground,
@@ -726,7 +789,7 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
                   Container(
                     margin: const EdgeInsets.symmetric(horizontal: 40),
                     child: Text(
-                      "Add a moment from your day",
+                      l10n.addMomentFromDay,
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 13,
@@ -765,7 +828,7 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
                 ),
                 child: const Icon(Icons.camera_alt, color: AppColors.primary),
               ),
-              title: const Text('Take Photo'),
+              title: Text(l10n.takePhoto),
               onTap: () async {
                 Navigator.pop(context);
                 await _pickImage(ImageSource.camera);
@@ -780,7 +843,7 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
                 ),
                 child: const Icon(Icons.photo_library, color: AppColors.primary),
               ),
-              title: const Text('Choose from Gallery'),
+              title: Text(l10n.chooseFromGallery),
               onTap: () async {
                 Navigator.pop(context);
                 await _pickImage(ImageSource.gallery);

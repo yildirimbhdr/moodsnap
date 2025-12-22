@@ -353,4 +353,85 @@ class AppLocalizationsTR implements AppLocalizations {
 
   @override
   String get basedOnEntries => "Kayıtlarına göre";
+
+  @override
+  String get heyThere => "Merhaba";
+
+  @override
+  String get tapToTrackMood => "Ruh halini kaydetmek için dokun";
+
+  @override
+  String get addMomentFromDay => "Günün bir anını ekle";
+
+  @override
+  String get takePhoto => "Fotoğraf Çek";
+
+  @override
+  String get chooseFromGallery => "Galeriden Seç";
+
+  @override
+  String get customMoods => "Özel Ruh Halleri";
+
+  @override
+  String get manageYourMoods => "Ruh hallerini yönet";
+
+  @override
+  String get createCustomMood => "Özel Ruh Hali Oluştur";
+
+  @override
+  String get editMood => "Ruh Halini Düzenle";
+
+  @override
+  String get moodName => "Ruh Hali Adı";
+
+  @override
+  String get moodEmoji => "Emoji";
+
+  @override
+  String get moodColor => "Renk";
+
+  @override
+  String get selectEmoji => "Emoji Seç";
+
+  @override
+  String get selectColor => "Renk Seç";
+
+  @override
+  String get create => "Oluştur";
+
+  @override
+  String get update => "Güncelle";
+
+  @override
+  String get deleteMood => "Ruh Halini Sil";
+
+  @override
+  String get deleteMoodWarning => "Bu özel ruh halini silmek istediğinize emin misiniz? Bu işlem geri alınamaz.";
+
+  @override
+  String get cannotDeleteDefault => "Varsayılan ruh halleri silinemez";
+
+  @override
+  String get noCustomMoods => "Henüz özel ruh hali yok";
+
+  @override
+  String get tapToCreateFirst => "İlk özel ruh halini oluşturmak için + düğmesine dokun";
+
+  @override
+  String get defaultMoods => "Varsayılan Ruh Halleri";
+
+  @override
+  String get customMoodsCount => "Özel Ruh Halleri";
+
+  @override
+  String get moodNameRequired => "Lütfen bir isim girin";
+
+  @override
+  String get moodEmojiRequired => "Lütfen bir emoji seçin";
+
+  @override
+  String get moodNameExists => "Bu isim zaten kullanılıyor";
+
+  @override
+  String get moodEmojiExists => "Bu emoji zaten kullanılıyor";
 }

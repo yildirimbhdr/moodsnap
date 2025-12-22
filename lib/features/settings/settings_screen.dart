@@ -5,6 +5,7 @@ import '../../core/theme/app_colors.dart';
 import '../../main.dart';
 import '../../app.dart';
 import '../achievements/achievements_screen.dart';
+import '../custom_moods/custom_moods_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -100,6 +101,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => const AchievementsScreen(),
+                    ),
+                  );
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Custom Moods Section
+          _buildSection(
+            title: l10n.customMoods,
+            children: [
+              _buildListTile(
+                icon: Icons.palette_outlined,
+                title: l10n.customMoods,
+                subtitle: l10n.manageYourMoods,
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const CustomMoodsScreen(),
                     ),
                   );
                 },

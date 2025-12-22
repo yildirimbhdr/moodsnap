@@ -349,4 +349,85 @@ class AppLocalizationsDE implements AppLocalizations {
 
   @override
   String get basedOnEntries => "Basierend auf deinen Einträgen";
+
+  @override
+  String get heyThere => "Hallo";
+
+  @override
+  String get tapToTrackMood => "Tippen, um Stimmung zu verfolgen";
+
+  @override
+  String get addMomentFromDay => "Fügen Sie einen Moment aus Ihrem Tag hinzu";
+
+  @override
+  String get takePhoto => "Foto aufnehmen";
+
+  @override
+  String get chooseFromGallery => "Aus Galerie wählen";
+
+  @override
+  String get customMoods => "Benutzerdefinierte Stimmungen";
+
+  @override
+  String get manageYourMoods => "Verwalten Sie Ihre Stimmungen";
+
+  @override
+  String get createCustomMood => "Benutzerdefinierte Stimmung erstellen";
+
+  @override
+  String get editMood => "Stimmung bearbeiten";
+
+  @override
+  String get moodName => "Stimmungsname";
+
+  @override
+  String get moodEmoji => "Emoji";
+
+  @override
+  String get moodColor => "Farbe";
+
+  @override
+  String get selectEmoji => "Emoji auswählen";
+
+  @override
+  String get selectColor => "Farbe auswählen";
+
+  @override
+  String get create => "Erstellen";
+
+  @override
+  String get update => "Aktualisieren";
+
+  @override
+  String get deleteMood => "Stimmung löschen";
+
+  @override
+  String get deleteMoodWarning => "Sind Sie sicher, dass Sie diese benutzerdefinierte Stimmung löschen möchten? Diese Aktion kann nicht rückgängig gemacht werden.";
+
+  @override
+  String get cannotDeleteDefault => "Standardstimmungen können nicht gelöscht werden";
+
+  @override
+  String get noCustomMoods => "Noch keine benutzerdefinierten Stimmungen";
+
+  @override
+  String get tapToCreateFirst => "Tippen Sie auf +, um Ihre erste benutzerdefinierte Stimmung zu erstellen";
+
+  @override
+  String get defaultMoods => "Standardstimmungen";
+
+  @override
+  String get customMoodsCount => "Benutzerdefinierte Stimmungen";
+
+  @override
+  String get moodNameRequired => "Bitte geben Sie einen Namen ein";
+
+  @override
+  String get moodEmojiRequired => "Bitte wählen Sie ein Emoji aus";
+
+  @override
+  String get moodNameExists => "Dieser Name wird bereits verwendet";
+
+  @override
+  String get moodEmojiExists => "Dieses Emoji wird bereits verwendet";
 }

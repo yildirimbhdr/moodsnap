@@ -21,7 +21,7 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
   late final storage;
   late final userName;
-  late final streak;
+  late int streak;
   MoodEntry? todayEntry;
   @override
   void initState() {
@@ -30,6 +30,13 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
     userName = storage.getUserName();
     streak = storage.getCurrentStreak();
     todayEntry = storage.getTodayMood();
+  }
+
+  void _refreshData() {
+    setState(() {
+      streak = storage.getCurrentStreak();
+      todayEntry = storage.getTodayMood();
+    });
   }
 
   @override
@@ -73,7 +80,7 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    userName != null ? "Hey, $userName! 👋" : "Hey there! 👋",
+                    userName != null ? "Hey, $userName! 👋" : "${l10n.heyThere}! 👋",
                     style: const TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.bold,
@@ -263,6 +270,8 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildPatternInsights(AppLocalizations l10n) {
     final allEntries = storage.getAllMoodEntries();
+    final customMoodService = ref.read(customMoodServiceProvider);
+
     if (allEntries.length < 5) {
       return const SizedBox.shrink(); // Need at least 5 entries
     }
@@ -396,12 +405,12 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
                     const Icon(Icons.arrow_forward, size: 16, color: AppColors.textSecondary),
                     const SizedBox(width: 8),
                     Text(
-                      EmojiConstants.getEmoji(topInsight.affectedMood),
+                      EmojiConstants.getEmoji(topInsight.affectedMood, customMoodService: customMoodService),
                       style: const TextStyle(fontSize: 24),
                     ),
                     const SizedBox(width: 6),
                     Text(
-                      topInsight.affectedMood,
+                      EmojiConstants.getLocalizedMood(topInsight.affectedMood, l10n, customMoodService: customMoodService),
                       style: const TextStyle(
                         fontSize: 14,
                         fontWeight: FontWeight.w600,
@@ -462,6 +471,7 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
 
   Widget _lastEntriesSection(l10n) {
     final List<MoodEntry> recentEntries = storage.getRecentMoodEntries(3);
+    final customMoodService = ref.read(customMoodServiceProvider);
 
     if (recentEntries.isEmpty) {
       return const SizedBox.shrink();
@@ -509,7 +519,7 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    EmojiConstants.moods[entry.mood] ?? '✨',
+                    EmojiConstants.getEmoji(entry.mood, customMoodService: customMoodService),
                     style: const TextStyle(fontSize: 28),
                   ),
                 ),
@@ -519,7 +529,7 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        entry.mood,
+                        EmojiConstants.getLocalizedMood(entry.mood, l10n, customMoodService: customMoodService),
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
@@ -566,112 +576,113 @@ class _MoodEntryScreenState extends ConsumerState<HomeScreen> {
   }
 
 
-  Widget currentMoodCart(l10n) => GestureDetector(
-    onTap: () async {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const MoodEntryScreen()),
-      ).then((_) {
-        setState(() {
-          final entry = storage.getTodayMood();
-          if (entry != null) {
-            todayEntry = entry;
-          }
+  Widget currentMoodCart(l10n) {
+    final customMoodService = ref.read(customMoodServiceProvider);
+
+    return GestureDetector(
+      onTap: () async {
+        Navigator.push(
+          context,
+          MaterialPageRoute(builder: (context) => const MoodEntryScreen()),
+        ).then((_) {
+          _refreshData();
         });
-      });
-    },
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: todayEntry != null
-              ? [
-                  AppColors.primary.withOpacity(0.8),
-                  AppColors.primary,
-                ]
-              : [
-                  const Color(0xFF6C63FF).withOpacity(0.8),
-                  const Color(0xFF6C63FF),
-                ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: (todayEntry != null ? AppColors.primary : const Color(0xFF6C63FF))
-                .withOpacity(0.4),
-            blurRadius: 25,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.calendar_today, color: Colors.white, size: 14),
-                    const SizedBox(width: 6),
-                    Text(
-                      'Today',
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.95),
-                        fontSize: 13,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(24),
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: todayEntry != null
+                ? [
+                    AppColors.primary.withOpacity(0.8),
+                    AppColors.primary,
+                  ]
+                : [
+                    const Color(0xFF6C63FF).withOpacity(0.8),
+                    const Color(0xFF6C63FF),
                   ],
-                ),
-              ),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.2),
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.edit, color: Colors.white, size: 18),
-              ),
-            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
           ),
-          const SizedBox(height: 24),
-          Text(
-            EmojiConstants.moods[todayEntry?.mood] ?? '✨',
-            style: const TextStyle(fontSize: 90),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            todayEntry != null
-                ? todayEntry!.mood
-                : l10n.todayQuestion,
-            style: const TextStyle(
-              color: Colors.white,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
+          borderRadius: BorderRadius.circular(28),
+          boxShadow: [
+            BoxShadow(
+              color: (todayEntry != null ? AppColors.primary : const Color(0xFF6C63FF))
+                  .withOpacity(0.4),
+              blurRadius: 25,
+              offset: const Offset(0, 12),
             ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            todayEntry != null ? l10n.touchToChange : 'Tap to track your mood',
-            style: TextStyle(
-              color: Colors.white.withOpacity(0.85),
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          ],
+        ),
+        child: Column(
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today, color: Colors.white, size: 14),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.today,
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.95),
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Icon(Icons.edit, color: Colors.white, size: 18),
+                ),
+              ],
             ),
-          ),
-        ],
+            const SizedBox(height: 24),
+            Text(
+              todayEntry != null
+                  ? EmojiConstants.getEmoji(todayEntry!.mood, customMoodService: customMoodService)
+                  : '✨',
+              style: const TextStyle(fontSize: 90),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              todayEntry != null
+                  ? EmojiConstants.getLocalizedMood(todayEntry!.mood, l10n, customMoodService: customMoodService)
+                  : l10n.todayQuestion,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              todayEntry != null ? l10n.touchToChange : l10n.tapToTrackMood,
+              style: TextStyle(
+                color: Colors.white.withOpacity(0.85),
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
       ),
-    ),
-  );
+    );
+  }
 
 }

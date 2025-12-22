@@ -353,4 +353,85 @@ class AppLocalizationsEN implements AppLocalizations {
 
   @override
   String get basedOnEntries => "Based on your entries";
+
+  @override
+  String get heyThere => "Hey there";
+
+  @override
+  String get tapToTrackMood => "Tap to track your mood";
+
+  @override
+  String get addMomentFromDay => "Add a moment from your day";
+
+  @override
+  String get takePhoto => "Take Photo";
+
+  @override
+  String get chooseFromGallery => "Choose from Gallery";
+
+  @override
+  String get customMoods => "Custom Moods";
+
+  @override
+  String get manageYourMoods => "Manage your moods";
+
+  @override
+  String get createCustomMood => "Create Custom Mood";
+
+  @override
+  String get editMood => "Edit Mood";
+
+  @override
+  String get moodName => "Mood Name";
+
+  @override
+  String get moodEmoji => "Emoji";
+
+  @override
+  String get moodColor => "Color";
+
+  @override
+  String get selectEmoji => "Select Emoji";
+
+  @override
+  String get selectColor => "Select Color";
+
+  @override
+  String get create => "Create";
+
+  @override
+  String get update => "Update";
+
+  @override
+  String get deleteMood => "Delete Mood";
+
+  @override
+  String get deleteMoodWarning => "Are you sure you want to delete this custom mood? This action cannot be undone.";
+
+  @override
+  String get cannotDeleteDefault => "Cannot delete default moods";
+
+  @override
+  String get noCustomMoods => "No custom moods yet";
+
+  @override
+  String get tapToCreateFirst => "Tap + button to create your first custom mood";
+
+  @override
+  String get defaultMoods => "Default Moods";
+
+  @override
+  String get customMoodsCount => "Custom Moods";
+
+  @override
+  String get moodNameRequired => "Please enter a name";
+
+  @override
+  String get moodEmojiRequired => "Please select an emoji";
+
+  @override
+  String get moodNameExists => "This name is already in use";
+
+  @override
+  String get moodEmojiExists => "This emoji is already in use";
 }

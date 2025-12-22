@@ -183,6 +183,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final storage = ref.watch(storageServiceProvider);
+    final customMoodService = ref.read(customMoodServiceProvider);
     var entries = storage.getMoodEntriesForMonth(
       _currentMonth.year,
       _currentMonth.month,
@@ -320,7 +321,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                   ),
                   _buildStatItem(
                     icon: mostCommonMood != null
-                        ? EmojiConstants.getEmoji(mostCommonMood)
+                        ? EmojiConstants.getEmoji(mostCommonMood, customMoodService: customMoodService)
                         : '📊',
                     label: l10n.mostCommon,
                     value: '${entries.length} ${l10n.days}',
@@ -490,7 +491,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                         child: Center(
                           child: Text(
                             entry != null
-                                ? EmojiConstants.getEmoji(entry.mood)
+                                ? EmojiConstants.getEmoji(entry.mood, customMoodService: customMoodService)
                                 : '',
                             textAlign: TextAlign.center,
                             style: const TextStyle(
