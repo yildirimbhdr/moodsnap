@@ -153,7 +153,7 @@ class DayDetailSheet extends ConsumerWidget {
       context: context,
       builder: (context) => AlertDialog(
         title: Text(l10n.delete),
-        content: const Text('Bu günü silmek istediğinize emin misiniz?'),
+        content: Text(l10n.sureDeleteToday),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),

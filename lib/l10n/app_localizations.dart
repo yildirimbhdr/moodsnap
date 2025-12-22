@@ -116,6 +116,7 @@ abstract class AppLocalizations {
   String get name;
   String get nameInput;
   String get deleteAllDataConfirmation;
+  String get sureDeleteToday;
   
 
 }

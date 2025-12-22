@@ -231,4 +231,6 @@ class AppLocalizationsTR implements AppLocalizations {
   String get nameInput => 'İsim Girişi';
   @override
   String get deleteAllDataConfirmation => 'Tüm ruh hali kayıtlarınız, seri ve ayarlarınız silinecek. Bu işlem geri alınamaz.';
+  @override
+  String get sureDeleteToday => "";
 }

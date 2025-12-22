@@ -231,4 +231,6 @@ class AppLocalizationsEN implements AppLocalizations {
   String get nameInput => 'Enter your name';
   @override
   String get deleteAllDataConfirmation => 'All your mood entries, streak, and settings will be deleted. This action is irreversible.';
+  @override
+  String get sureDeleteToday => "";
 }

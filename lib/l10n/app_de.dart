@@ -227,4 +227,6 @@ class AppLocalizationsDE implements AppLocalizations {
   String get nameInput => 'Dein Name eingeben';
   @override
   String get deleteAllDataConfirmation => 'Durch das Löschen aller Daten werden alle deine Stimmungseinträge, deine Serie und deine Einstellungen gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.';
+  @override
+  String get sureDeleteToday => '';
 }
