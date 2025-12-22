@@ -232,5 +232,125 @@ class AppLocalizationsEN implements AppLocalizations {
   @override
   String get deleteAllDataConfirmation => 'All your mood entries, streak, and settings will be deleted. This action is irreversible.';
   @override
-  String get sureDeleteToday => "";
+  String get sureDeleteToday => "Are you sure you want to delete this mood entry?";
+
+  @override
+  String get deleteWarning => "This action cannot be undone";
+
+  @override
+  String get note => "Note";
+
+  @override
+  String get photo => "Photo";
+
+  @override
+  String get photoNotFound => "Photo not found";
+
+  @override
+  String get noDetails => "No details added";
+
+  @override
+  String get addPhoto => "Add Photo";
+
+  @override
+  String get tapToAddPhoto => "Tap to add a photo";
+
+  @override
+  String get pleaseSelectMood => "Please select a mood";
+
+  @override
+  String get achievements => "Achievements";
+
+  @override
+  String get achievementsUnlocked => "Achievements Unlocked";
+
+  @override
+  String get achievementFirstStep => "First Step";
+
+  @override
+  String get achievementFirstStepDesc => "You added your first mood!";
+
+  @override
+  String get achievementStreak7 => "Rising Star";
+
+  @override
+  String get achievementStreak7Desc => "7 days streak";
+
+  @override
+  String get achievementStreak30 => "Moon Master";
+
+  @override
+  String get achievementStreak30Desc => "30 days streak";
+
+  @override
+  String get achievementStreak100 => "Legend";
+
+  @override
+  String get achievementStreak100Desc => "100 days streak";
+
+  @override
+  String get achievementPhoto10 => "Photographer";
+
+  @override
+  String get achievementPhoto10Desc => "10 photo entries";
+
+  @override
+  String get percentComplete => "complete";
+
+  @override
+  String get whyThisMood => "Why did you feel this way?";
+
+  @override
+  String get selectReasons => "Select reasons (optional)";
+
+  @override
+  String get reasons => "Reasons";
+
+  @override
+  String get tagWork => "Work";
+
+  @override
+  String get tagFamily => "Family";
+
+  @override
+  String get tagHealth => "Health";
+
+  @override
+  String get tagWeather => "Weather";
+
+  @override
+  String get tagSleep => "Sleep";
+
+  @override
+  String get tagSocial => "Social";
+
+  @override
+  String get tagExercise => "Exercise";
+
+  @override
+  String get tagFood => "Food";
+
+  @override
+  String get tagRelationship => "Relationship";
+
+  @override
+  String get tagMoney => "Money";
+
+  @override
+  String get filterByTag => "Filter by tag";
+
+  @override
+  String get allEntries => "All entries";
+
+  @override
+  String get noEntriesWithTag => "No entries with this tag";
+
+  @override
+  String get patterns => "Patterns";
+
+  @override
+  String get triggerDetected => "Pattern detected";
+
+  @override
+  String get basedOnEntries => "Based on your entries";
 }

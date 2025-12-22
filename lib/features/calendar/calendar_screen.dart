@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/emoji_constants.dart';
+import '../../core/constants/tag_constants.dart';
+import '../../core/utils/haptic_utils.dart';
 import '../../main.dart';
 import 'widgets/day_detail_sheet.dart';
 
@@ -15,6 +18,7 @@ class CalendarScreen extends ConsumerStatefulWidget {
 
 class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   late DateTime _currentMonth;
+  String? _selectedTagFilter;
 
   @override
   void initState() {
@@ -23,18 +27,21 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
   }
 
   void _previousMonth() {
+    HapticUtils.lightImpact();
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month - 1);
     });
   }
 
   void _nextMonth() {
+    HapticUtils.lightImpact();
     setState(() {
       _currentMonth = DateTime(_currentMonth.year, _currentMonth.month + 1);
     });
   }
 
   void _showDayDetail(DateTime date) {
+    HapticUtils.lightImpact();
     final storage = ref.read(storageServiceProvider);
     final entry = storage.getMoodEntry(date);
 
@@ -48,14 +55,146 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
     }
   }
 
+  void _showTagFilter() {
+    final l10n = AppLocalizations.of(context);
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.7,
+        minChildSize: 0.5,
+        maxChildSize: 0.9,
+        builder: (context, scrollController) => Container(
+          decoration: const BoxDecoration(
+            color: AppColors.cardBackground,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+          ),
+          child: Column(
+            children: [
+              // Handle bar
+              Padding(
+                padding: const EdgeInsets.only(top: 12, bottom: 8),
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: AppColors.textHint.withOpacity(0.3),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              // Header
+              Padding(
+                padding: const EdgeInsets.fromLTRB(24, 16, 24, 16),
+                child: Row(
+                  children: [
+                    const Icon(Icons.filter_list, color: AppColors.primary),
+                    const SizedBox(width: 12),
+                    Text(
+                      l10n.filterByTag,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.textPrimary,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // Scrollable content
+              Expanded(
+                child: ListView(
+                  controller: scrollController,
+                  padding: const EdgeInsets.fromLTRB(24, 0, 24, 32),
+                  children: [
+                    // All entries option
+                    _buildFilterOption(l10n, null, l10n.allEntries, '📊'),
+                    const SizedBox(height: 12),
+                    // Tag options
+                    ...TagConstants.all.map((tag) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: 12),
+                        child: _buildFilterOption(
+                          l10n,
+                          tag,
+                          TagConstants.getLocalizedTag(tag, l10n),
+                          TagConstants.getTagEmoji(tag),
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFilterOption(AppLocalizations l10n, String? tag, String label, String emoji) {
+    final isSelected = _selectedTagFilter == tag;
+    return GestureDetector(
+      onTap: () {
+        HapticUtils.lightImpact();
+        setState(() {
+          _selectedTagFilter = tag;
+        });
+        Navigator.pop(context);
+      },
+      child: Container(
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: isSelected
+              ? AppColors.primary.withOpacity(0.1)
+              : AppColors.background,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(
+            color: isSelected
+                ? AppColors.primary
+                : AppColors.textHint.withOpacity(0.2),
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Text(emoji, style: const TextStyle(fontSize: 24)),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 16,
+                  fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
+                  color: isSelected ? AppColors.primary : AppColors.textPrimary,
+                ),
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle, color: AppColors.primary),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context);
     final storage = ref.watch(storageServiceProvider);
-    final entries = storage.getMoodEntriesForMonth(
+    var entries = storage.getMoodEntriesForMonth(
       _currentMonth.year,
       _currentMonth.month,
     );
+
+    // Apply tag filter
+    if (_selectedTagFilter != null) {
+      entries = entries.where((entry) {
+        return entry.tags != null && entry.tags!.contains(_selectedTagFilter);
+      }).toList();
+    }
+
     final streak = storage.getCurrentStreak();
 
     // Get month name
@@ -96,6 +235,33 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
             fontWeight: FontWeight.bold,
           ),
         ),
+        actions: [
+          Stack(
+            children: [
+              IconButton(
+                icon: const Icon(Icons.filter_list, color: AppColors.primary),
+                onPressed: () {
+                  HapticUtils.lightImpact();
+                  _showTagFilter();
+                },
+              ),
+              if (_selectedTagFilter != null)
+                Positioned(
+                  right: 8,
+                  top: 8,
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.primary,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
+            ],
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(16),
@@ -292,7 +458,8 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
               return GestureDetector(
                 onTap: entry != null ? () => _showDayDetail(date) : null,
-                child: Container(
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 200),
                   decoration: BoxDecoration(
                     color: isToday
                         ? AppColors.primary.withOpacity(0.1)
@@ -303,6 +470,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                         : null,
                   ),
                   child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
                         '$day',
@@ -316,6 +484,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                               : AppColors.textPrimary,
                         ),
                       ),
+                      const SizedBox(height: 2),
                       SizedBox(
                         height: 20,
                         child: Center(
@@ -334,7 +503,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
                       ),
                     ],
                   ),
-                ),
+                ).animate(key: ValueKey('$day-${entry?.mood ?? "empty"}')).fadeIn(duration: 200.ms),
               );
             },
           ),

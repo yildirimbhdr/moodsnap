@@ -117,8 +117,50 @@ abstract class AppLocalizations {
   String get nameInput;
   String get deleteAllDataConfirmation;
   String get sureDeleteToday;
-  
+  String get deleteWarning;
+  String get note;
+  String get photo;
+  String get photoNotFound;
+  String get noDetails;
+  String get addPhoto;
+  String get tapToAddPhoto;
+  String get pleaseSelectMood;
 
+  // Achievements
+  String get achievements;
+  String get achievementsUnlocked;
+  String get achievementFirstStep;
+  String get achievementFirstStepDesc;
+  String get achievementStreak7;
+  String get achievementStreak7Desc;
+  String get achievementStreak30;
+  String get achievementStreak30Desc;
+  String get achievementStreak100;
+  String get achievementStreak100Desc;
+  String get achievementPhoto10;
+  String get achievementPhoto10Desc;
+  String get percentComplete;
+
+  // Tags & Reasons
+  String get whyThisMood;
+  String get selectReasons;
+  String get reasons;
+  String get tagWork;
+  String get tagFamily;
+  String get tagHealth;
+  String get tagWeather;
+  String get tagSleep;
+  String get tagSocial;
+  String get tagExercise;
+  String get tagFood;
+  String get tagRelationship;
+  String get tagMoney;
+  String get filterByTag;
+  String get allEntries;
+  String get noEntriesWithTag;
+  String get patterns;
+  String get triggerDetected;
+  String get basedOnEntries;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

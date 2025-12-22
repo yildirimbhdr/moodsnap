@@ -232,5 +232,125 @@ class AppLocalizationsTR implements AppLocalizations {
   @override
   String get deleteAllDataConfirmation => 'Tüm ruh hali kayıtlarınız, seri ve ayarlarınız silinecek. Bu işlem geri alınamaz.';
   @override
-  String get sureDeleteToday => "";
+  String get sureDeleteToday => "Bu ruh hali kaydını silmek istediğinize emin misiniz?";
+
+  @override
+  String get deleteWarning => "Bu işlem geri alınamaz";
+
+  @override
+  String get note => "Not";
+
+  @override
+  String get photo => "Fotoğraf";
+
+  @override
+  String get photoNotFound => "Fotoğraf bulunamadı";
+
+  @override
+  String get noDetails => "Detay eklenmedi";
+
+  @override
+  String get addPhoto => "Fotoğraf Ekle";
+
+  @override
+  String get tapToAddPhoto => "Fotoğraf eklemek için dokun";
+
+  @override
+  String get pleaseSelectMood => "Lütfen bir ruh hali seçin";
+
+  @override
+  String get achievements => "Başarılar";
+
+  @override
+  String get achievementsUnlocked => "Başarı Açıldı";
+
+  @override
+  String get achievementFirstStep => "İlk Adım";
+
+  @override
+  String get achievementFirstStepDesc => "İlk ruh halini ekledin!";
+
+  @override
+  String get achievementStreak7 => "Başlangıç Yıldızı";
+
+  @override
+  String get achievementStreak7Desc => "7 gün üst üste kayıt";
+
+  @override
+  String get achievementStreak30 => "Ay Ustası";
+
+  @override
+  String get achievementStreak30Desc => "30 gün üst üste kayıt";
+
+  @override
+  String get achievementStreak100 => "Efsane";
+
+  @override
+  String get achievementStreak100Desc => "100 gün üst üste kayıt";
+
+  @override
+  String get achievementPhoto10 => "Fotoğrafçı";
+
+  @override
+  String get achievementPhoto10Desc => "10 fotoğraflı kayıt";
+
+  @override
+  String get percentComplete => "tamamlandı";
+
+  @override
+  String get whyThisMood => "Neden böyle hissettin?";
+
+  @override
+  String get selectReasons => "Sebepler seç (opsiyonel)";
+
+  @override
+  String get reasons => "Sebepler";
+
+  @override
+  String get tagWork => "İş";
+
+  @override
+  String get tagFamily => "Aile";
+
+  @override
+  String get tagHealth => "Sağlık";
+
+  @override
+  String get tagWeather => "Hava Durumu";
+
+  @override
+  String get tagSleep => "Uyku";
+
+  @override
+  String get tagSocial => "Sosyal";
+
+  @override
+  String get tagExercise => "Egzersiz";
+
+  @override
+  String get tagFood => "Yemek";
+
+  @override
+  String get tagRelationship => "İlişkiler";
+
+  @override
+  String get tagMoney => "Para";
+
+  @override
+  String get filterByTag => "Etikete göre filtrele";
+
+  @override
+  String get allEntries => "Tüm kayıtlar";
+
+  @override
+  String get noEntriesWithTag => "Bu etikete sahip kayıt yok";
+
+  @override
+  String get patterns => "Desenler";
+
+  @override
+  String get triggerDetected => "Desen tespit edildi";
+
+  @override
+  String get basedOnEntries => "Kayıtlarına göre";
 }

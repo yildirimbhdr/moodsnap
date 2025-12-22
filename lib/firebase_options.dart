@@ -50,19 +50,19 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyA6vesA5eUPGisLj4rXAgYrQUYrHo3MVGY',
-    appId: '1:870001085280:android:27d1a2b422a5ae68692c05',
-    messagingSenderId: '870001085280',
-    projectId: 'moodsnap-8e5d1',
-    storageBucket: 'moodsnap-8e5d1.firebasestorage.app',
+    apiKey: 'AIzaSyA-LsZG-gY8pU-sKrEe7qWATHre240elA0',
+    appId: '1:189908992224:android:e0630ca18b09ec58d35085',
+    messagingSenderId: '189908992224',
+    projectId: 'moodysnap-d5d38',
+    storageBucket: 'moodysnap-d5d38.firebasestorage.app',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyDSoUew-K4bIhj6zAu_DEzY-fxvLn6sFhM',
-    appId: '1:870001085280:ios:a734bb578dab83bb692c05',
-    messagingSenderId: '870001085280',
-    projectId: 'moodsnap-8e5d1',
-    storageBucket: 'moodsnap-8e5d1.firebasestorage.app',
-    iosBundleId: 'com.example.moodie',
+    apiKey: 'AIzaSyAvxp_5BCj9bBtd7VMATZiQGjnA5nmekSA',
+    appId: '1:189908992224:ios:566543275e3769bbd35085',
+    messagingSenderId: '189908992224',
+    projectId: 'moodysnap-d5d38',
+    storageBucket: 'moodysnap-d5d38.firebasestorage.app',
+    iosBundleId: 'com.moodysnap',
   );
 }

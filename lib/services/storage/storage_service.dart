@@ -1,21 +1,29 @@
 import 'package:hive_flutter/hive_flutter.dart';
-import 'package:moodie/data/models/mood_entry.dart';
+import 'package:moodysnap/data/models/mood_entry.dart';
+import '../../data/models/custom_mood.dart';
+import '../../data/models/achievement.dart';
 
 class StorageService {
   static const String _moodBoxName = 'mood_entries';
   static const String _settingsBoxName = 'settings';
-  
+  static const String _customMoodsBoxName = 'custom_moods';
+
   late Box<MoodEntry> _moodBox;
   late Box _settingsBox;
+  late Box<CustomMood> _customMoodsBox;
 
   // Initialize Hive
   Future<void> init() async {
     await Hive.initFlutter();
-    
+
     Hive.registerAdapter(MoodEntryAdapter());
-    
+    Hive.registerAdapter(CustomMoodAdapter());
+    Hive.registerAdapter(AchievementAdapter());
+    Hive.registerAdapter(AchievementTypeAdapter());
+
     _moodBox = await Hive.openBox<MoodEntry>(_moodBoxName);
     _settingsBox = await Hive.openBox(_settingsBoxName);
+    _customMoodsBox = await Hive.openBox<CustomMood>(_customMoodsBoxName);
   }
 
    getRecentMoodEntries(int count)  {
@@ -128,9 +136,76 @@ class StorageService {
     return '${date.year}-${date.month.toString().padLeft(2, '0')}-${date.day.toString().padLeft(2, '0')}';
   }
 
+  // Custom Moods Operations
+  Future<void> saveCustomMood(CustomMood mood) async {
+    await _customMoodsBox.put(mood.id, mood);
+  }
+
+  List<CustomMood> getAllCustomMoods() {
+    return _customMoodsBox.values.toList()
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
+  }
+
+  Future<void> deleteCustomMood(String id) async {
+    await _customMoodsBox.delete(id);
+  }
+
+  // Get all mood names (default + custom)
+  Map<String, String> getAllMoodOptions() {
+    final defaultMoods = {
+      'Happy': '😊',
+      'Sad': '😢',
+      'Anxious': '😰',
+      'Calm': '😌',
+      'Excited': '🤩',
+      'Tired': '😴',
+      'Angry': '😠',
+      'Grateful': '🙏',
+    };
+
+    final customMoods = <String, String>{};
+    for (var mood in _customMoodsBox.values) {
+      customMoods[mood.name] = mood.emoji;
+    }
+
+    return {...defaultMoods, ...customMoods};
+  }
+
+  // Tag Operations
+  List<MoodEntry> getMoodEntriesByTag(String tag) {
+    return _moodBox.values
+        .where((entry) => entry.tags?.contains(tag) ?? false)
+        .toList()
+      ..sort((a, b) => b.date.compareTo(a.date));
+  }
+
+  List<String> getAllTags() {
+    final tags = <String>{};
+    for (var entry in _moodBox.values) {
+      if (entry.tags != null) {
+        tags.addAll(entry.tags!);
+      }
+    }
+    return tags.toList()..sort();
+  }
+
+  // Get most used tags
+  Map<String, int> getTagUsageCount() {
+    final tagCounts = <String, int>{};
+    for (var entry in _moodBox.values) {
+      if (entry.tags != null) {
+        for (var tag in entry.tags!) {
+          tagCounts[tag] = (tagCounts[tag] ?? 0) + 1;
+        }
+      }
+    }
+    return tagCounts;
+  }
+
   // Clear all data (for settings/debug)
   Future<void> clearAllData() async {
     await _moodBox.clear();
     await _settingsBox.clear();
+    await _customMoodsBox.clear();
   }
 }

@@ -1,50 +1,41 @@
 // GENERATED CODE - DO NOT MODIFY BY HAND
 
-part of 'mood_entry.dart';
+part of 'custom_mood.dart';
 
 // **************************************************************************
 // TypeAdapterGenerator
 // **************************************************************************
 
-class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
+class CustomMoodAdapter extends TypeAdapter<CustomMood> {
   @override
-  final int typeId = 0;
+  final int typeId = 3;
 
   @override
-  MoodEntry read(BinaryReader reader) {
+  CustomMood read(BinaryReader reader) {
     final numOfFields = reader.readByte();
     final fields = <int, dynamic>{
       for (int i = 0; i < numOfFields; i++) reader.readByte(): reader.read(),
     };
-    return MoodEntry(
+    return CustomMood(
       id: fields[0] as String,
-      date: fields[1] as DateTime,
-      mood: fields[2] as String,
-      note: fields[3] as String?,
-      photoPath: fields[4] as String?,
-      audioPath: fields[5] as String?,
-      tags: (fields[6] as List?)?.cast<String>(),
+      name: fields[1] as String,
+      emoji: fields[2] as String,
+      createdAt: fields[3] as DateTime,
     );
   }
 
   @override
-  void write(BinaryWriter writer, MoodEntry obj) {
+  void write(BinaryWriter writer, CustomMood obj) {
     writer
-      ..writeByte(7)
+      ..writeByte(4)
       ..writeByte(0)
       ..write(obj.id)
       ..writeByte(1)
-      ..write(obj.date)
+      ..write(obj.name)
       ..writeByte(2)
-      ..write(obj.mood)
+      ..write(obj.emoji)
       ..writeByte(3)
-      ..write(obj.note)
-      ..writeByte(4)
-      ..write(obj.photoPath)
-      ..writeByte(5)
-      ..write(obj.audioPath)
-      ..writeByte(6)
-      ..write(obj.tags);
+      ..write(obj.createdAt);
   }
 
   @override
@@ -53,7 +44,7 @@ class MoodEntryAdapter extends TypeAdapter<MoodEntry> {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is MoodEntryAdapter &&
+      other is CustomMoodAdapter &&
           runtimeType == other.runtimeType &&
           typeId == other.typeId;
 }

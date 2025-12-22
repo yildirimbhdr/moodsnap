@@ -2,8 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moodie/firebase_options.dart';
-import 'package:moodie/services/storage/storage_service.dart';
+import 'package:moodysnap/firebase_options.dart';
+import 'package:moodysnap/services/storage/storage_service.dart';
+import 'package:moodysnap/services/achievement_service.dart';
 import 'app.dart';
 
 void main() async {
@@ -13,12 +14,15 @@ void main() async {
 );
   final storageService = StorageService();
   await storageService.init();
-  
+
+  final achievementService = AchievementService();
+  await achievementService.init();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
-  
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
@@ -27,11 +31,12 @@ void main() async {
       systemNavigationBarIconBrightness: Brightness.dark,
     ),
   );
-  
+
   runApp(
     ProviderScope(
       overrides: [
         storageServiceProvider.overrideWithValue(storageService),
+        achievementServiceProvider.overrideWithValue(achievementService),
       ],
       child: const MoodSnapApp(),
     ),
@@ -40,4 +45,8 @@ void main() async {
 
 final storageServiceProvider = Provider<StorageService>((ref) {
   throw UnimplementedError('StorageService must be overridden');
+});
+
+final achievementServiceProvider = Provider<AchievementService>((ref) {
+  throw UnimplementedError('AchievementService must be overridden');
 });

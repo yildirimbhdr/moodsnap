@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "870001085280",
-    "project_id": "moodsnap-8e5d1",
-    "storage_bucket": "moodsnap-8e5d1.firebasestorage.app"
+    "project_number": "189908992224",
+    "project_id": "moodysnap-d5d38",
+    "storage_bucket": "moodysnap-d5d38.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:870001085280:android:27d1a2b422a5ae68692c05",
+        "mobilesdk_app_id": "1:189908992224:android:e0630ca18b09ec58d35085",
         "android_client_info": {
-          "package_name": "com.example.moodie"
+          "package_name": "com.moodysnap"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyA6vesA5eUPGisLj4rXAgYrQUYrHo3MVGY"
+          "current_key": "AIzaSyA-LsZG-gY8pU-sKrEe7qWATHre240elA0"
         }
       ],
       "services": {

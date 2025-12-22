@@ -1,12 +1,10 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moodie/features/main/main_container.dart';
-import 'package:moodie/l10n/app_localizations.dart';
+import 'package:moodysnap/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../main.dart';
 import '../../app.dart';
+import '../achievements/achievements_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -81,6 +79,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 onChanged: (value) {
                   storage.setNotificationsEnabled(value);
                   setState(() {});
+                },
+              ),
+            ],
+          ),
+
+          const SizedBox(height: 16),
+
+          // Achievements Section
+          _buildSection(
+            title: l10n.achievements,
+            children: [
+              _buildListTile(
+                icon: Icons.emoji_events,
+                title: l10n.achievements,
+                subtitle: l10n.achievementsUnlocked,
+                trailing: const Icon(Icons.chevron_right),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AchievementsScreen(),
+                    ),
+                  );
                 },
               ),
             ],
@@ -231,13 +252,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   String _getLanguageName(String code) {
     switch (code) {
       case 'tr':
-        return 'Türkçe';
+        return 'Türkçe 🇹🇷';
       case 'en':
-        return 'English';
+        return 'English 🇺🇸';
       case 'de':
-        return 'Deutsch';
+        return 'Deutsch 🇩🇪';
       default:
-        return 'Türkçe';
+        return 'Türkçe 🇹🇷';
     }
   }
 
@@ -284,46 +305,36 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           mainAxisSize: MainAxisSize.min,
           children: [
             RadioListTile<String>(
-              title: const Text('Türkçe'),
+              title: const Text('Türkçe 🇹🇷'),
               value: 'tr',
               groupValue: currentLanguage,
               onChanged: (value) {
                 storage.setLanguage(value!);
                 ref.read(languageProvider.notifier).state = value;
                 Navigator.pop(context);
-                // Restart app to apply language
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MainContainer()),
-                  (route) => false,
-                );
+                setState(() {});
               },
             ),
             RadioListTile<String>(
-              title: const Text('English'),
+              title: const Text('English 🇺🇸'),
               value: 'en',
               groupValue: currentLanguage,
               onChanged: (value) {
                 storage.setLanguage(value!);
                 ref.read(languageProvider.notifier).state = value;
                 Navigator.pop(context);
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MainContainer()),
-                  (route) => false,
-                );
+                setState(() {});
               },
             ),
             RadioListTile<String>(
-              title: const Text('Deutsch'),
+              title: const Text('Deutsch 🇩🇪'),
               value: 'de',
               groupValue: currentLanguage,
               onChanged: (value) {
                 storage.setLanguage(value!);
                 ref.read(languageProvider.notifier).state = value;
                 Navigator.pop(context);
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(builder: (_) => const MainContainer()),
-                  (route) => false,
-                );
+                setState(() {});
               },
             ),
           ],

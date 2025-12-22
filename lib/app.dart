@@ -13,7 +13,7 @@ class MoodSnapApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final storageService = ref.watch(storageServiceProvider);
-    final languageCode = storageService.getLanguage();
+    final languageCode = ref.watch(languageProvider);
 
     return MaterialApp(
       title: 'MoodSnap',

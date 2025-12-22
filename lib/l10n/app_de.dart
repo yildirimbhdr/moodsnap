@@ -228,5 +228,125 @@ class AppLocalizationsDE implements AppLocalizations {
   @override
   String get deleteAllDataConfirmation => 'Durch das Löschen aller Daten werden alle deine Stimmungseinträge, deine Serie und deine Einstellungen gelöscht. Dieser Vorgang kann nicht rückgängig gemacht werden.';
   @override
-  String get sureDeleteToday => '';
+  String get sureDeleteToday => 'Möchten Sie diesen Stimmungseintrag wirklich löschen?';
+
+  @override
+  String get deleteWarning => 'Diese Aktion kann nicht rückgängig gemacht werden';
+
+  @override
+  String get note => 'Notiz';
+
+  @override
+  String get photo => 'Foto';
+
+  @override
+  String get photoNotFound => 'Foto nicht gefunden';
+
+  @override
+  String get noDetails => 'Keine Details hinzugefügt';
+
+  @override
+  String get addPhoto => 'Foto hinzufügen';
+
+  @override
+  String get tapToAddPhoto => 'Zum Hinzufügen eines Fotos antippen';
+
+  @override
+  String get pleaseSelectMood => 'Bitte wählen Sie eine Stimmung';
+
+  @override
+  String get achievements => "Erfolge";
+
+  @override
+  String get achievementsUnlocked => "Erfolge freigeschaltet";
+
+  @override
+  String get achievementFirstStep => "Erster Schritt";
+
+  @override
+  String get achievementFirstStepDesc => "Du hast deine erste Stimmung hinzugefügt!";
+
+  @override
+  String get achievementStreak7 => "Aufsteigender Stern";
+
+  @override
+  String get achievementStreak7Desc => "7 Tage Serie";
+
+  @override
+  String get achievementStreak30 => "Mondmeister";
+
+  @override
+  String get achievementStreak30Desc => "30 Tage Serie";
+
+  @override
+  String get achievementStreak100 => "Legende";
+
+  @override
+  String get achievementStreak100Desc => "100 Tage Serie";
+
+  @override
+  String get achievementPhoto10 => "Fotograf";
+
+  @override
+  String get achievementPhoto10Desc => "10 Foto-Einträge";
+
+  @override
+  String get percentComplete => "abgeschlossen";
+
+  @override
+  String get whyThisMood => "Warum hast du dich so gefühlt?";
+
+  @override
+  String get selectReasons => "Gründe auswählen (optional)";
+
+  @override
+  String get reasons => "Gründe";
+
+  @override
+  String get tagWork => "Arbeit";
+
+  @override
+  String get tagFamily => "Familie";
+
+  @override
+  String get tagHealth => "Gesundheit";
+
+  @override
+  String get tagWeather => "Wetter";
+
+  @override
+  String get tagSleep => "Schlaf";
+
+  @override
+  String get tagSocial => "Sozial";
+
+  @override
+  String get tagExercise => "Sport";
+
+  @override
+  String get tagFood => "Essen";
+
+  @override
+  String get tagRelationship => "Beziehung";
+
+  @override
+  String get tagMoney => "Geld";
+
+  @override
+  String get filterByTag => "Nach Tag filtern";
+
+  @override
+  String get allEntries => "Alle Einträge";
+
+  @override
+  String get noEntriesWithTag => "Keine Einträge mit diesem Tag";
+
+  @override
+  String get patterns => "Muster";
+
+  @override
+  String get triggerDetected => "Muster erkannt";
+
+  @override
+  String get basedOnEntries => "Basierend auf deinen Einträgen";
 }

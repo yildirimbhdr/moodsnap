@@ -18,9 +18,12 @@ class MoodEntry extends HiveObject {
   
   @HiveField(4)
   final String? photoPath;
-  
+
   @HiveField(5)
   final String? audioPath;
+
+  @HiveField(6)
+  final List<String>? tags;
 
   MoodEntry({
     required this.id,
@@ -29,6 +32,7 @@ class MoodEntry extends HiveObject {
     this.note,
     this.photoPath,
     this.audioPath,
+    this.tags,
   });
 
   // Factory constructor for easy creation
@@ -37,6 +41,7 @@ class MoodEntry extends HiveObject {
     String? note,
     String? photoPath,
     String? audioPath,
+    List<String>? tags,
   }) {
     return MoodEntry(
       id: DateTime.now().millisecondsSinceEpoch.toString(),
@@ -45,6 +50,7 @@ class MoodEntry extends HiveObject {
       note: note,
       photoPath: photoPath,
       audioPath: audioPath,
+      tags: tags,
     );
   }
 
@@ -54,6 +60,7 @@ class MoodEntry extends HiveObject {
     String? note,
     String? photoPath,
     String? audioPath,
+    List<String>? tags,
   }) {
     return MoodEntry(
       id: id,
@@ -62,6 +69,7 @@ class MoodEntry extends HiveObject {
       note: note ?? this.note,
       photoPath: photoPath ?? this.photoPath,
       audioPath: audioPath ?? this.audioPath,
+      tags: tags ?? this.tags,
     );
   }
 
