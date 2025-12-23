@@ -6,6 +6,7 @@ import 'package:moodysnap/firebase_options.dart';
 import 'package:moodysnap/services/storage/storage_service.dart';
 import 'package:moodysnap/services/achievement_service.dart';
 import 'package:moodysnap/services/custom_mood_service.dart';
+import 'package:moodysnap/services/notification_service.dart';
 import 'package:moodysnap/core/utils/result.dart';
 import 'app.dart';
 
@@ -31,6 +32,19 @@ void main() async {
     print('Warning: ${customMoodResult.errorOrNull}');
   }
 
+  // Initialize notification service
+  final notificationService = NotificationService();
+  final notificationResult = await notificationService.init();
+  if (notificationResult.isFailure) {
+    print('Warning: ${notificationResult.errorOrNull}');
+  }
+
+  // Schedule daily reminder if enabled
+  if (storageService.areNotificationsEnabled()) {
+    final hour = storageService.getNotificationTime();
+    await notificationService.scheduleDailyReminder(hour);
+  }
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -51,6 +65,7 @@ void main() async {
         storageServiceProvider.overrideWithValue(storageService),
         achievementServiceProvider.overrideWithValue(achievementService),
         customMoodServiceProvider.overrideWithValue(customMoodService),
+        notificationServiceProvider.overrideWithValue(notificationService),
       ],
       child: const MoodSnapApp(),
     ),
@@ -67,4 +82,8 @@ final achievementServiceProvider = Provider<AchievementService>((ref) {
 
 final customMoodServiceProvider = Provider<CustomMoodService>((ref) {
   throw UnimplementedError('CustomMoodService must be overridden');
+});
+
+final notificationServiceProvider = Provider<NotificationService>((ref) {
+  throw UnimplementedError('NotificationService must be overridden');
 });

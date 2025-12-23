@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moodysnap/l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/result.dart';
+import '../../core/utils/battery_optimization_helper.dart';
 import '../../main.dart';
 import '../../app.dart';
 import '../achievements/achievements_screen.dart';
@@ -75,13 +77,77 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               _buildSwitchTile(
                 icon: Icons.notifications_outlined,
                 title: l10n.dailyMoodReminder,
-                subtitle: l10n.everyDayNotificationSequence.replaceAll("{hour}", "21:00"),
+                subtitle: l10n.everyDayNotificationSequence.replaceAll("{hour}", "${storage.getNotificationTime()}:00"),
                 value: notificationsEnabled,
-                onChanged: (value) {
-                  storage.setNotificationsEnabled(value);
+                onChanged: (value) async {
+                  if (value) {
+                    // Request permission first
+                    final notificationService = ref.read(notificationServiceProvider);
+                    final permissionResult = await notificationService.requestPermissions();
+
+                    if (permissionResult.dataOrNull == true) {
+                      storage.setNotificationsEnabled(true);
+                      final hour = storage.getNotificationTime();
+                      await notificationService.scheduleDailyReminder(hour);
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('${l10n.dailyMoodReminder} aktif edildi! 🔔'),
+                            backgroundColor: AppColors.primary,
+                          ),
+                        );
+                      }
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Bildirim izni verilmedi'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    }
+                  } else {
+                    // Disable notifications
+                    final notificationService = ref.read(notificationServiceProvider);
+                    await notificationService.cancelDailyReminder();
+                    storage.setNotificationsEnabled(false);
+                  }
                   setState(() {});
                 },
               ),
+              if (notificationsEnabled) ...[
+                _buildListTile(
+                  icon: Icons.access_time,
+                  title: 'Bildirim Saati',
+                  subtitle: '${storage.getNotificationTime()}:00',
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: () => _showNotificationTimePicker(context, l10n),
+                ),
+                _buildListTile(
+                  icon: Icons.notifications_active,
+                  title: 'Test Bildirimi Gönder',
+                  subtitle: 'Bildirimlerin çalışıp çalışmadığını test et',
+                  onTap: () async {
+                    final notificationService = ref.read(notificationServiceProvider);
+                    final result = await notificationService.showTestNotification();
+                    if (mounted && result.isSuccess) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Test bildirimi gönderildi! 🔔'),
+                          backgroundColor: AppColors.primary,
+                        ),
+                      );
+                    }
+                  },
+                ),
+                _buildListTile(
+                  icon: Icons.help_outline,
+                  title: 'Bildirimler Gelmiyor mu?',
+                  subtitle: 'Batarya optimizasyonu ayarları',
+                  onTap: () => BatteryOptimizationHelper.showBatteryOptimizationGuide(context),
+                ),
+              ],
             ],
           ),
 
@@ -365,6 +431,54 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         ),
       ),
     );
+  }
+
+  void _showNotificationTimePicker(BuildContext context, l10n) async {
+    final storage = ref.read(storageServiceProvider);
+    final currentHour = storage.getNotificationTime();
+
+    final TimeOfDay? picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay(hour: currentHour, minute: 0),
+      builder: (context, child) {
+        return Theme(
+          data: Theme.of(context).copyWith(
+            timePickerTheme: TimePickerThemeData(
+              backgroundColor: AppColors.cardBackground,
+              hourMinuteColor: AppColors.primary.withOpacity(0.1),
+              hourMinuteTextColor: AppColors.primary,
+              dayPeriodColor: AppColors.primary.withOpacity(0.2),
+              dayPeriodTextColor: AppColors.primary,
+              dialHandColor: AppColors.primary,
+              dialBackgroundColor: AppColors.primary.withOpacity(0.1),
+              entryModeIconColor: AppColors.primary,
+            ),
+          ),
+          child: child!,
+        );
+      },
+    );
+
+    if (picked != null && picked.hour != currentHour) {
+      storage.setNotificationTime(picked.hour);
+
+      // Reschedule notification with new time
+      if (storage.areNotificationsEnabled()) {
+        final notificationService = ref.read(notificationServiceProvider);
+        await notificationService.scheduleDailyReminder(picked.hour);
+      }
+
+      setState(() {});
+
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Bildirim saati ${picked.hour}:00 olarak ayarlandı'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+    }
   }
 
   void _showDeleteAllDialog(BuildContext context,l10n) {

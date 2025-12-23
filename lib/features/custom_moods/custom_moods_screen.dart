@@ -115,7 +115,7 @@ class CustomMoodsScreen extends ConsumerWidget {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await HapticUtils.lightImpact();
-          final result = await Navigator.push(
+          await Navigator.push(
             context,
             MaterialPageRoute(builder: (_) => const CustomMoodFormScreen()),
           );
