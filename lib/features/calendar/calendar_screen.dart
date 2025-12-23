@@ -368,6 +368,7 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
 
   Widget _buildCalendarGrid(List entries) {
     final l10n = AppLocalizations.of(context);
+    final customMoodService = ref.read(customMoodServiceProvider);
     final daysInMonth = DateTime(
       _currentMonth.year,
       _currentMonth.month + 1,
