@@ -8,9 +8,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/constants/emoji_constants.dart';
 import '../../../core/constants/tag_constants.dart';
 import '../../../core/utils/haptic_utils.dart';
+import '../../../core/utils/result.dart';
 import '../../../l10n/app_localizations.dart';
 import '../../../main.dart';
-import '../../moon_entry/mood_entry_screen.dart';
+import '../../mood_entry/mood_entry_screen.dart';
 
 class DayDetailSheet extends ConsumerWidget {
   final MoodEntry entry;
@@ -473,10 +474,20 @@ class DayDetailSheet extends ConsumerWidget {
             onPressed: () async {
               HapticUtils.mediumImpact();
               final storage = ref.read(storageServiceProvider);
-              await storage.deleteMoodEntry(entry.dateKey);
-              if (context.mounted) {
-                Navigator.pop(context);
+              final result = await storage.deleteMoodEntry(entry.dateKey);
+
+              if (!context.mounted) return;
+
+              if (result.isFailure) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(result.errorOrNull?.message ?? 'Failed to delete mood'),
+                    backgroundColor: Colors.red,
+                  ),
+                );
               }
+
+              Navigator.pop(context);
             },
             style: ElevatedButton.styleFrom(
               backgroundColor: Colors.red.shade600,

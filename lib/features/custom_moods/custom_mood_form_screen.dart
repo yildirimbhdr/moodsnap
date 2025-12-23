@@ -5,7 +5,9 @@ import '../../data/models/custom_mood.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/utils/haptic_utils.dart';
+import '../../core/utils/result.dart';
 import '../../main.dart';
+import 'custom_moods_notifier.dart';
 
 class CustomMoodFormScreen extends ConsumerStatefulWidget {
   final CustomMood? moodToEdit;
@@ -33,7 +35,7 @@ class _CustomMoodFormScreenState extends ConsumerState<CustomMoodFormScreen> {
 
   Future<void> _saveMood() async {
     final l10n = AppLocalizations.of(context);
-    final customMoodService = ref.read(customMoodServiceProvider);
+    final notifier = ref.read(customMoodsNotifierProvider.notifier);
 
     if (_nameController.text.trim().isEmpty) {
       _showError(l10n.moodNameRequired);
@@ -44,26 +46,30 @@ class _CustomMoodFormScreenState extends ConsumerState<CustomMoodFormScreen> {
       return;
     }
 
-    if (customMoodService.isNameUsed(_nameController.text, excludeId: widget.moodToEdit?.id)) {
-      _showError(l10n.moodNameExists);
-      return;
-    }
-    if (customMoodService.isEmojiUsed(_selectedEmoji, excludeId: widget.moodToEdit?.id)) {
-      _showError(l10n.moodEmojiExists);
-      return;
-    }
-
     final colorHex = '#${_selectedColor.value.toRadixString(16).substring(2).toUpperCase()}';
 
-    if (widget.moodToEdit != null) {
-      final updated = widget.moodToEdit!.copyWith(name: _nameController.text, emoji: _selectedEmoji, colorHex: colorHex);
-      await customMoodService.updateMood(updated);
-    } else {
-      final mood = CustomMood.create(name: _nameController.text, emoji: _selectedEmoji, colorHex: colorHex);
-      await customMoodService.createMood(mood);
-    }
+    final result = widget.moodToEdit != null
+        ? await notifier.updateMood(
+            widget.moodToEdit!.copyWith(
+              name: _nameController.text,
+              emoji: _selectedEmoji,
+              colorHex: colorHex,
+            ),
+          )
+        : await notifier.createMood(
+            CustomMood.create(
+              name: _nameController.text,
+              emoji: _selectedEmoji,
+              colorHex: colorHex,
+            ),
+          );
 
-    if (mounted) Navigator.pop(context, true);
+    if (!mounted) return;
+
+    result.fold(
+      onSuccess: (_) => Navigator.pop(context, true),
+      onFailure: (error) => _showError(error.message),
+    );
   }
 
   void _showError(String message) {
@@ -102,9 +108,18 @@ class _CustomMoodFormScreenState extends ConsumerState<CustomMoodFormScreen> {
                       ),
                     );
                     if (confirmed == true && mounted) {
-                      final customMoodService = ref.read(customMoodServiceProvider);
-                      await customMoodService.deleteMood(widget.moodToEdit!.id);
-                      Navigator.pop(context, true);
+                      final notifier = ref.read(customMoodsNotifierProvider.notifier);
+                      final result = await notifier.deleteMood(widget.moodToEdit!.id);
+
+                      if (!mounted) return;
+
+                      result.fold(
+                        onSuccess: (_) => Navigator.pop(context, true),
+                        onFailure: (error) {
+                          Navigator.pop(context);
+                          _showError(error.message);
+                        },
+                      );
                     }
                   },
                 ),

@@ -2,6 +2,7 @@ import 'package:hive_flutter/hive_flutter.dart';
 import 'package:moodysnap/data/models/mood_entry.dart';
 import '../../data/models/custom_mood.dart';
 import '../../data/models/achievement.dart';
+import '../../core/utils/result.dart';
 
 class StorageService {
   static const String _moodBoxName = 'mood_entries';
@@ -13,17 +14,27 @@ class StorageService {
   late Box<CustomMood> _customMoodsBox;
 
   // Initialize Hive
-  Future<void> init() async {
-    await Hive.initFlutter();
+  Future<Result<void>> init() async {
+    try {
+      await Hive.initFlutter();
 
-    Hive.registerAdapter(MoodEntryAdapter());
-    Hive.registerAdapter(CustomMoodAdapter());
-    Hive.registerAdapter(AchievementAdapter());
-    Hive.registerAdapter(AchievementTypeAdapter());
+      Hive.registerAdapter(MoodEntryAdapter());
+      Hive.registerAdapter(CustomMoodAdapter());
+      Hive.registerAdapter(AchievementAdapter());
+      Hive.registerAdapter(AchievementTypeAdapter());
 
-    _moodBox = await Hive.openBox<MoodEntry>(_moodBoxName);
-    _settingsBox = await Hive.openBox(_settingsBoxName);
-    _customMoodsBox = await Hive.openBox<CustomMood>(_customMoodsBoxName);
+      _moodBox = await Hive.openBox<MoodEntry>(_moodBoxName);
+      _settingsBox = await Hive.openBox(_settingsBoxName);
+      _customMoodsBox = await Hive.openBox<CustomMood>(_customMoodsBoxName);
+
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to initialize storage service',
+        originalError: e,
+      ));
+    }
   }
 
    getRecentMoodEntries(int count)  {
@@ -31,8 +42,17 @@ class StorageService {
       ..sort((a, b) => b.date.compareTo(a.date));
     return entries.take(count).toList();
   }
-  Future<void> saveMoodEntry(MoodEntry entry) async {
-    await _moodBox.put(entry.dateKey, entry);
+  Future<Result<void>> saveMoodEntry(MoodEntry entry) async {
+    try {
+      await _moodBox.put(entry.dateKey, entry);
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to save mood entry',
+        originalError: e,
+      ));
+    }
   }
 
   MoodEntry? getMoodEntry(DateTime date) {
@@ -56,8 +76,17 @@ class StorageService {
       ..sort((a, b) => a.date.compareTo(b.date));
   }
 
-  Future<void> deleteMoodEntry(String dateKey) async {
-    await _moodBox.delete(dateKey);
+  Future<Result<void>> deleteMoodEntry(String dateKey) async {
+    try {
+      await _moodBox.delete(dateKey);
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to delete mood entry',
+        originalError: e,
+      ));
+    }
   }
 
   // Settings Operations

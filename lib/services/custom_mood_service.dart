@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import '../data/models/custom_mood.dart';
+import '../core/utils/result.dart';
 
 /// Service for managing custom moods
 /// Follows SOLID principles and provides clean API
@@ -9,9 +10,18 @@ class CustomMoodService {
   late Box<CustomMood> _box;
 
   /// Initialize the service and register default moods
-  Future<void> init() async {
-    _box = await Hive.openBox<CustomMood>(_boxName);
-    await _initializeDefaultMoods();
+  Future<Result<void>> init() async {
+    try {
+      _box = await Hive.openBox<CustomMood>(_boxName);
+      await _initializeDefaultMoods();
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to initialize custom moods service',
+        originalError: e,
+      ));
+    }
   }
 
   /// Initialize default moods if not already present
@@ -98,32 +108,136 @@ class CustomMoodService {
     return mood?.emoji ?? '✨';
   }
 
-  /// Get mood name
+  /// Get mood name (returns ID for translation lookup if default mood)
+  /// For default moods, returns the ID (like 'happy', 'sad') for l10n lookup
+  /// For custom moods, returns the actual custom name
   String getMoodName(String id) {
     final mood = getMoodById(id);
-    return mood?.name ?? id;
+    if (mood == null) return id;
+
+    // For default moods, return ID so UI can translate it
+    // For custom moods, return the actual name
+    return mood.isDefault ? id : mood.name;
   }
 
   /// Create a new custom mood
-  Future<void> createMood(CustomMood mood) async {
-    await _box.put(mood.id, mood);
+  Future<Result<void>> createMood(CustomMood mood) async {
+    try {
+      // Validate mood name
+      if (mood.name.trim().isEmpty) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Mood name cannot be empty',
+        ));
+      }
+
+      // Check for duplicates
+      if (isNameUsed(mood.name)) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Mood name already exists',
+        ));
+      }
+
+      if (isEmojiUsed(mood.emoji)) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Emoji already used',
+        ));
+      }
+
+      await _box.put(mood.id, mood);
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to create mood',
+        originalError: e,
+      ));
+    }
   }
 
   /// Update an existing mood
-  Future<void> updateMood(CustomMood mood) async {
-    if (!mood.isDefault) {
+  Future<Result<void>> updateMood(CustomMood mood) async {
+    try {
+      // Cannot update default moods
+      if (mood.isDefault) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Cannot update default moods',
+        ));
+      }
+
+      // Check if mood exists
+      if (!moodExists(mood.id)) {
+        return const Failure(AppError(
+          type: ErrorType.notFound,
+          message: 'Mood not found',
+        ));
+      }
+
+      // Validate mood name
+      if (mood.name.trim().isEmpty) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Mood name cannot be empty',
+        ));
+      }
+
+      // Check for duplicates (excluding current mood)
+      if (isNameUsed(mood.name, excludeId: mood.id)) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Mood name already exists',
+        ));
+      }
+
+      if (isEmojiUsed(mood.emoji, excludeId: mood.id)) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Emoji already used',
+        ));
+      }
+
       await _box.put(mood.id, mood);
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to update mood',
+        originalError: e,
+      ));
     }
   }
 
   /// Delete a custom mood (cannot delete default moods)
-  Future<bool> deleteMood(String id) async {
-    final mood = _box.get(id);
-    if (mood != null && !mood.isDefault) {
+  Future<Result<void>> deleteMood(String id) async {
+    try {
+      final mood = _box.get(id);
+
+      if (mood == null) {
+        return const Failure(AppError(
+          type: ErrorType.notFound,
+          message: 'Mood not found',
+        ));
+      }
+
+      if (mood.isDefault) {
+        return const Failure(AppError(
+          type: ErrorType.validation,
+          message: 'Cannot delete default moods',
+        ));
+      }
+
       await _box.delete(id);
-      return true;
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.storage,
+        message: 'Failed to delete mood',
+        originalError: e,
+      ));
     }
-    return false;
   }
 
   /// Check if mood exists

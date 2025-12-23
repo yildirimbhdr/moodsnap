@@ -2,7 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:moodysnap/features/moon_entry/mood_entry_screen.dart';
+import 'package:moodysnap/features/mood_entry/mood_entry_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/emoji_constants.dart';

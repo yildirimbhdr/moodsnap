@@ -9,6 +9,7 @@ import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/constants/tag_constants.dart';
 import '../../core/utils/haptic_utils.dart';
+import '../../core/utils/result.dart';
 import '../../data/models/mood_entry.dart';
 import '../../main.dart';
 
@@ -97,7 +98,18 @@ class _MoodEntryScreenState extends ConsumerState<MoodEntryScreen> {
       );
     }
 
-    await storage.saveMoodEntry(entry);
+    final saveResult = await storage.saveMoodEntry(entry);
+
+    if (saveResult.isFailure) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(saveResult.errorOrNull?.message ?? 'Failed to save mood'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     final streak = storage.getCurrentStreak();
     await storage.updateLongestStreak(streak);
