@@ -28,7 +28,7 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
-  - vibration (1.7.5):
+  - vibration (3.0.0):
     - Flutter
 
 DEPENDENCIES:
@@ -70,11 +70,11 @@ SPEC CHECKSUMS:
   FirebaseCore: 0e38ad5d62d980a47a64b8e9301ffa311457be04
   FirebaseCoreInternal: 69bf1306a05b8ac43004f6cc1f804bb7b05b229e
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_local_notifications: ad39620c743ea4c15127860f4b5641649a988100
+  flutter_local_notifications: a5a732f069baa862e728d839dd2ebb904737effb
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   image_picker_ios: e0ece4aa2a75771a7de3fa735d26d90817041326
   path_provider_foundation: bb55f6dbba17d0dccd6737fe6f7f34fbd0376880
-  vibration: 8e2f50fc35bb736f9eecb7dd9f7047fbb6a6e888
+  vibration: ca8104a8875b9c493e15b21b04e456befd0ff6eb
 
 PODFILE CHECKSUM: 53a6aebc29ccee84c41f92f409fc20cd4ca011f1
 

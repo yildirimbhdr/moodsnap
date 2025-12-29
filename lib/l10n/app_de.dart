@@ -2,7 +2,7 @@ import 'app_localizations.dart';
 
 class AppLocalizationsDE implements AppLocalizations {
   @override
-  String get appName => 'MoodSnap';
+  String get appName => 'MoodieSnap';
 
   @override
   String get skip => 'Überspringen';

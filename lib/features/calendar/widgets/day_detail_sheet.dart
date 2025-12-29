@@ -340,14 +340,17 @@ class DayDetailSheet extends ConsumerWidget {
                   child: ElevatedButton.icon(
                     onPressed: () async {
                       HapticUtils.lightImpact();
-                      Navigator.pop(context);
                       // Navigate to mood entry screen with edit mode
-                      await Navigator.push(
+                      final result = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => MoodEntryScreen(editEntry: entry),
                         ),
                       );
+                      // Close the bottom sheet after returning from edit
+                      if (context.mounted && result != null) {
+                        Navigator.pop(context);
+                      }
                     },
                     icon: const Icon(Icons.edit_outlined, size: 20),
                     label: Text(l10n.edit),

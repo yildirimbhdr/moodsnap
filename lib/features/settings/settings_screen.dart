@@ -243,7 +243,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             child: Column(
               children: [
                 Text(
-                  'MoodSnap',
+                  'MoodieSnap',
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
