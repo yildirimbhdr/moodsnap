@@ -7,6 +7,7 @@ import 'package:moodysnap/services/storage/storage_service.dart';
 import 'package:moodysnap/services/achievement_service.dart';
 import 'package:moodysnap/services/custom_mood_service.dart';
 import 'package:moodysnap/services/notification_service.dart';
+import 'package:moodysnap/services/admob_service.dart';
 import 'package:moodysnap/core/utils/result.dart';
 import 'app.dart';
 
@@ -34,15 +35,24 @@ void main() async {
 
   // Initialize notification service
   final notificationService = NotificationService();
+  notificationService.setStorageService(storageService); // Set storage for localization
   final notificationResult = await notificationService.init();
   if (notificationResult.isFailure) {
     print('Warning: ${notificationResult.errorOrNull}');
   }
 
+  // Initialize AdMob service
+  final adMobService = AdMobService();
+  final adMobResult = await adMobService.init();
+  if (adMobResult.isFailure) {
+    print('Warning: ${adMobResult.errorOrNull}');
+  }
+
   // Schedule daily reminder if enabled
   if (storageService.areNotificationsEnabled()) {
-    final hour = storageService.getNotificationTime();
-    await notificationService.scheduleDailyReminder(hour);
+    final hour = storageService.getNotificationHour();
+    final minute = storageService.getNotificationMinute();
+    await notificationService.scheduleDailyReminder(hour, minute);
   }
 
   await SystemChrome.setPreferredOrientations([
@@ -66,6 +76,7 @@ void main() async {
         achievementServiceProvider.overrideWithValue(achievementService),
         customMoodServiceProvider.overrideWithValue(customMoodService),
         notificationServiceProvider.overrideWithValue(notificationService),
+        adMobServiceProvider.overrideWithValue(adMobService),
       ],
       child: const MoodSnapApp(),
     ),
@@ -86,4 +97,8 @@ final customMoodServiceProvider = Provider<CustomMoodService>((ref) {
 
 final notificationServiceProvider = Provider<NotificationService>((ref) {
   throw UnimplementedError('NotificationService must be overridden');
+});
+
+final adMobServiceProvider = Provider<AdMobService>((ref) {
+  throw UnimplementedError('AdMobService must be overridden');
 });

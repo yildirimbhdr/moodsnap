@@ -434,4 +434,49 @@ class AppLocalizationsTR implements AppLocalizations {
 
   @override
   String get moodEmojiExists => "Bu emoji zaten kullanılıyor";
+
+  @override
+  String get notificationTitle => "Bugün nasıl hissediyorsun? 🌙";
+
+  @override
+  String get notificationBody => "Ruh halini kaydetme zamanı geldi!";
+
+  @override
+  String get notificationChannelName => "Günlük Hatırlatma";
+
+  @override
+  String get notificationChannelDesc => "Her gün ruh halini kaydetmen için hatırlatma";
+
+  @override
+  String get testNotificationTitle => "Test Bildirimi 🔔";
+
+  @override
+  String get testNotificationBody => "Bildirimler çalışıyor!";
+
+  @override
+  String get notificationPermissionDenied => "Bildirim izni verilmedi";
+
+  @override
+  String get notificationTime => "Bildirim Saati";
+
+  @override
+  String get sendTestNotification => "Test Bildirimi Gönder";
+
+  @override
+  String get testNotificationDesc => "Bildirimlerin çalışıp çalışmadığını test et";
+
+  @override
+  String get testNotificationSent => "Test bildirimi gönderildi! 🔔";
+
+  @override
+  String get notificationsNotWorking => "Bildirimler Gelmiyor mu?";
+
+  @override
+  String get batteryOptimizationSettings => "Batarya optimizasyonu ayarları";
+
+  @override
+  String get notificationTimeSet => "Bildirim saati {time} olarak ayarlandı";
+
+  @override
+  String get notificationEnabled => "{title} aktif edildi! 🔔";
 }

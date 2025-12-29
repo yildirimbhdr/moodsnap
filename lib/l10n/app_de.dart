@@ -430,4 +430,49 @@ class AppLocalizationsDE implements AppLocalizations {
 
   @override
   String get moodEmojiExists => "Dieses Emoji wird bereits verwendet";
+
+  @override
+  String get notificationTitle => "Wie fühlst du dich heute? 🌙";
+
+  @override
+  String get notificationBody => "Zeit, deine Stimmung zu protokollieren!";
+
+  @override
+  String get notificationChannelName => "Tägliche Erinnerung";
+
+  @override
+  String get notificationChannelDesc => "Tägliche Erinnerung, deine Stimmung zu protokollieren";
+
+  @override
+  String get testNotificationTitle => "Test-Benachrichtigung 🔔";
+
+  @override
+  String get testNotificationBody => "Benachrichtigungen funktionieren!";
+
+  @override
+  String get notificationPermissionDenied => "Benachrichtigungsberechtigung verweigert";
+
+  @override
+  String get notificationTime => "Benachrichtigungszeit";
+
+  @override
+  String get sendTestNotification => "Test-Benachrichtigung senden";
+
+  @override
+  String get testNotificationDesc => "Teste, ob Benachrichtigungen funktionieren";
+
+  @override
+  String get testNotificationSent => "Test-Benachrichtigung gesendet! 🔔";
+
+  @override
+  String get notificationsNotWorking => "Benachrichtigungen funktionieren nicht?";
+
+  @override
+  String get batteryOptimizationSettings => "Batterieoptimierungseinstellungen";
+
+  @override
+  String get notificationTimeSet => "Benachrichtigungszeit auf {time} gesetzt";
+
+  @override
+  String get notificationEnabled => "{title} aktiviert! 🔔";
 }

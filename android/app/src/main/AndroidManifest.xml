@@ -5,6 +5,8 @@
     <uses-permission android:name="android.permission.VIBRATE"/>
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM"/>
     <uses-permission android:name="android.permission.USE_EXACT_ALARM"/>
+    <!-- AdMob Internet Permission -->
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:label="MoodieSnap"
@@ -37,6 +39,11 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
+
+        <!-- AdMob App ID (Test Mode) -->
+        <meta-data
+            android:name="com.google.android.gms.ads.APPLICATION_ID"
+            android:value="ca-app-pub-3940256099942544~3347511713"/>
 
         <!-- Notification receiver for boot completed -->
         <receiver

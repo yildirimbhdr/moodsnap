@@ -114,12 +114,17 @@ class StorageService {
     return _settingsBox.get('language', defaultValue: 'en');
   }
 
-  Future<void> setNotificationTime(int hour) async {
+  Future<void> setNotificationTime(int hour, int minute) async {
     await _settingsBox.put('notification_hour', hour);
+    await _settingsBox.put('notification_minute', minute);
   }
 
-  int getNotificationTime() {
+  int getNotificationHour() {
     return _settingsBox.get('notification_hour', defaultValue: 21);
+  }
+
+  int getNotificationMinute() {
+    return _settingsBox.get('notification_minute', defaultValue: 0);
   }
 
   Future<void> setNotificationsEnabled(bool enabled) async {

@@ -77,7 +77,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               _buildSwitchTile(
                 icon: Icons.notifications_outlined,
                 title: l10n.dailyMoodReminder,
-                subtitle: l10n.everyDayNotificationSequence.replaceAll("{hour}", "${storage.getNotificationTime()}:00"),
+                subtitle: l10n.everyDayNotificationSequence.replaceAll("{hour}", "${storage.getNotificationHour().toString().padLeft(2, '0')}:${storage.getNotificationMinute().toString().padLeft(2, '0')}"),
                 value: notificationsEnabled,
                 onChanged: (value) async {
                   if (value) {
@@ -87,12 +87,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
                     if (permissionResult.dataOrNull == true) {
                       storage.setNotificationsEnabled(true);
-                      final hour = storage.getNotificationTime();
-                      await notificationService.scheduleDailyReminder(hour);
+                      final hour = storage.getNotificationHour();
+                      final minute = storage.getNotificationMinute();
+                      await notificationService.scheduleDailyReminder(hour, minute);
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
-                            content: Text('${l10n.dailyMoodReminder} aktif edildi! 🔔'),
+                            content: Text(l10n.notificationEnabled.replaceAll('{title}', l10n.dailyMoodReminder)),
                             backgroundColor: AppColors.primary,
                           ),
                         );
@@ -100,8 +101,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     } else {
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Bildirim izni verilmedi'),
+                          SnackBar(
+                            content: Text(l10n.notificationPermissionDenied),
                             backgroundColor: Colors.red,
                           ),
                         );
@@ -119,22 +120,22 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               if (notificationsEnabled) ...[
                 _buildListTile(
                   icon: Icons.access_time,
-                  title: 'Bildirim Saati',
-                  subtitle: '${storage.getNotificationTime()}:00',
+                  title: l10n.notificationTime,
+                  subtitle: '${storage.getNotificationHour().toString().padLeft(2, '0')}:${storage.getNotificationMinute().toString().padLeft(2, '0')}',
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => _showNotificationTimePicker(context, l10n),
                 ),
                 _buildListTile(
                   icon: Icons.notifications_active,
-                  title: 'Test Bildirimi Gönder',
-                  subtitle: 'Bildirimlerin çalışıp çalışmadığını test et',
+                  title: l10n.sendTestNotification,
+                  subtitle: l10n.testNotificationDesc,
                   onTap: () async {
                     final notificationService = ref.read(notificationServiceProvider);
                     final result = await notificationService.showTestNotification();
                     if (mounted && result.isSuccess) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Test bildirimi gönderildi! 🔔'),
+                        SnackBar(
+                          content: Text(l10n.testNotificationSent),
                           backgroundColor: AppColors.primary,
                         ),
                       );
@@ -143,8 +144,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 _buildListTile(
                   icon: Icons.help_outline,
-                  title: 'Bildirimler Gelmiyor mu?',
-                  subtitle: 'Batarya optimizasyonu ayarları',
+                  title: l10n.notificationsNotWorking,
+                  subtitle: l10n.batteryOptimizationSettings,
                   onTap: () => BatteryOptimizationHelper.showBatteryOptimizationGuide(context),
                 ),
               ],
@@ -435,11 +436,12 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
   void _showNotificationTimePicker(BuildContext context, l10n) async {
     final storage = ref.read(storageServiceProvider);
-    final currentHour = storage.getNotificationTime();
+    final currentHour = storage.getNotificationHour();
+    final currentMinute = storage.getNotificationMinute();
 
     final TimeOfDay? picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay(hour: currentHour, minute: 0),
+      initialTime: TimeOfDay(hour: currentHour, minute: currentMinute),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
@@ -459,21 +461,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       },
     );
 
-    if (picked != null && picked.hour != currentHour) {
-      storage.setNotificationTime(picked.hour);
+    if (picked != null && (picked.hour != currentHour || picked.minute != currentMinute)) {
+      // IMPORTANT: await storage write before updating UI
+      await storage.setNotificationTime(picked.hour, picked.minute);
 
       // Reschedule notification with new time
       if (storage.areNotificationsEnabled()) {
         final notificationService = ref.read(notificationServiceProvider);
-        await notificationService.scheduleDailyReminder(picked.hour);
+        await notificationService.scheduleDailyReminder(picked.hour, picked.minute);
       }
 
       setState(() {});
 
       if (context.mounted) {
+        final timeStr = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Bildirim saati ${picked.hour}:00 olarak ayarlandı'),
+            content: Text(l10n.notificationTimeSet.replaceAll('{time}', timeStr)),
             backgroundColor: AppColors.primary,
           ),
         );

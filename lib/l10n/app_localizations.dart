@@ -194,6 +194,23 @@ abstract class AppLocalizations {
   String get moodEmojiRequired;
   String get moodNameExists;
   String get moodEmojiExists;
+
+  // Notification strings
+  String get notificationTitle;
+  String get notificationBody;
+  String get notificationChannelName;
+  String get notificationChannelDesc;
+  String get testNotificationTitle;
+  String get testNotificationBody;
+  String get notificationPermissionDenied;
+  String get notificationTime;
+  String get sendTestNotification;
+  String get testNotificationDesc;
+  String get testNotificationSent;
+  String get notificationsNotWorking;
+  String get batteryOptimizationSettings;
+  String get notificationTimeSet;
+  String get notificationEnabled;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

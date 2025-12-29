@@ -8,6 +8,7 @@ import '../../core/constants/tag_constants.dart';
 import '../../core/utils/haptic_utils.dart';
 import '../../main.dart';
 import 'widgets/day_detail_sheet.dart';
+import 'widgets/calendar_banner_ad.dart';
 
 class CalendarScreen extends ConsumerStatefulWidget {
   const CalendarScreen({super.key});
@@ -264,78 +265,89 @@ class _CalendarScreenState extends ConsumerState<CalendarScreen> {
           const SizedBox(width: 8),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Month selector
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                IconButton(
-                  onPressed: _previousMonth,
-                  icon: const Icon(Icons.chevron_left),
-                ),
-                Text(
-                  '$monthName ${_currentMonth.year}',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                IconButton(
-                  onPressed: _nextMonth,
-                  icon: const Icon(Icons.chevron_right),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 24),
-
-            // Stats card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.cardBackground,
-                borderRadius: BorderRadius.circular(16),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(16),
+              child: Column(
                 children: [
-                  _buildStatItem(
-                    icon: '🔥',
-                    label: l10n.streak,
-                    value: '$streak ${l10n.days}',
+                  // Month selector
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      IconButton(
+                        onPressed: _previousMonth,
+                        icon: const Icon(Icons.chevron_left),
+                      ),
+                      Text(
+                        '$monthName ${_currentMonth.year}',
+                        style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: _nextMonth,
+                        icon: const Icon(Icons.chevron_right),
+                      ),
+                    ],
                   ),
+
+                  const SizedBox(height: 24),
+
+                  // Stats card
                   Container(
-                    width: 1,
-                    height: 40,
-                    color: AppColors.textHint.withOpacity(0.3),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: AppColors.cardBackground,
+                      borderRadius: BorderRadius.circular(16),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceAround,
+                      children: [
+                        _buildStatItem(
+                          icon: '🔥',
+                          label: l10n.streak,
+                          value: '$streak ${l10n.days}',
+                        ),
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: AppColors.textHint.withOpacity(0.3),
+                        ),
+                        _buildStatItem(
+                          icon: mostCommonMood != null
+                              ? EmojiConstants.getEmoji(mostCommonMood, customMoodService: customMoodService)
+                              : '📊',
+                          label: l10n.mostCommon,
+                          value: '${entries.length} ${l10n.days}',
+                        ),
+                      ],
+                    ),
                   ),
-                  _buildStatItem(
-                    icon: mostCommonMood != null
-                        ? EmojiConstants.getEmoji(mostCommonMood, customMoodService: customMoodService)
-                        : '📊',
-                    label: l10n.mostCommon,
-                    value: '${entries.length} ${l10n.days}',
-                  ),
+
+                  const SizedBox(height: 24),
+
+                  // Calendar grid
+                  _buildCalendarGrid(entries),
+
+                  // Add bottom padding to prevent content from being hidden behind the ad
+                  const SizedBox(height: 16),
                 ],
               ),
             ),
-
-            const SizedBox(height: 24),
-
-            // Calendar grid
-            _buildCalendarGrid(entries),
-          ],
-        ),
+          ),
+          // Banner Ad - Fixed at bottom above bottom navigation
+          const CalendarBannerAd(),
+        ],
       ),
     );
   }

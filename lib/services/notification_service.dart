@@ -3,6 +3,7 @@ import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter/foundation.dart';
 import '../core/utils/result.dart';
+import 'storage/storage_service.dart';
 
 /// Service for managing local notifications
 class NotificationService {
@@ -12,6 +13,47 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _notifications = FlutterLocalNotificationsPlugin();
   bool _initialized = false;
+  StorageService? _storageService;
+
+  /// Set storage service for localization support
+  void setStorageService(StorageService storage) {
+    _storageService = storage;
+  }
+
+  /// Get localized strings based on current language
+  Map<String, String> _getLocalizedStrings() {
+    final language = _storageService?.getLanguage() ?? 'en';
+
+    switch (language) {
+      case 'tr':
+        return {
+          'notificationTitle': 'Bugün nasıl hissediyorsun? 🌙',
+          'notificationBody': 'Ruh halini kaydetme zamanı geldi!',
+          'channelName': 'Günlük Hatırlatma',
+          'channelDesc': 'Her gün ruh halini kaydetmen için hatırlatma',
+          'testTitle': 'Test Bildirimi 🔔',
+          'testBody': 'Bildirimler çalışıyor!',
+        };
+      case 'de':
+        return {
+          'notificationTitle': 'Wie fühlst du dich heute? 🌙',
+          'notificationBody': 'Zeit, deine Stimmung zu protokollieren!',
+          'channelName': 'Tägliche Erinnerung',
+          'channelDesc': 'Tägliche Erinnerung, deine Stimmung zu protokollieren',
+          'testTitle': 'Test-Benachrichtigung 🔔',
+          'testBody': 'Benachrichtigungen funktionieren!',
+        };
+      default: // English
+        return {
+          'notificationTitle': 'How are you feeling today? 🌙',
+          'notificationBody': "It's time to log your mood!",
+          'channelName': 'Daily Reminder',
+          'channelDesc': 'Daily reminder to log your mood',
+          'testTitle': 'Test Notification 🔔',
+          'testBody': 'Notifications are working!',
+        };
+    }
+  }
 
   /// Initialize notification service
   Future<Result<void>> init() async {
@@ -19,11 +61,18 @@ class NotificationService {
       // Initialize timezone
       tz.initializeTimeZones();
 
-      // Find local timezone
-      // For production, you should use flutter_native_timezone package
-      // For now, we'll use UTC+3 (Istanbul) as default
-      final String timeZoneName = 'Europe/Istanbul';
-      tz.setLocalLocation(tz.getLocation(timeZoneName));
+      // Use device's local timezone
+      // This ensures notifications work correctly regardless of user location
+      final String timeZoneName = DateTime.now().timeZoneName;
+      try {
+        tz.setLocalLocation(tz.getLocation(timeZoneName));
+      } catch (e) {
+        // Fallback to Europe/Istanbul if timezone not found
+        if (kDebugMode) {
+          print('⚠️  Could not set timezone $timeZoneName, using Europe/Istanbul as fallback');
+        }
+        tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
+      }
 
       // Android initialization settings
       const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
@@ -104,8 +153,8 @@ class NotificationService {
     }
   }
 
-  /// Schedule daily reminder at specific hour
-  Future<Result<void>> scheduleDailyReminder(int hour) async {
+  /// Schedule daily reminder at specific hour and minute
+  Future<Result<void>> scheduleDailyReminder(int hour, [int minute = 0]) async {
     try {
       if (!_initialized) {
         return const Failure(AppError(
@@ -119,30 +168,32 @@ class NotificationService {
 
       // Create notification time
       final now = tz.TZDateTime.now(tz.local);
-      // tz.TZDateTime scheduledDate = tz.TZDateTime(
-      //   tz.local,
-      //   now.year,
-      //   now.month,
-      //   now.day,
-      //   hour,
-      //   0,
-      // );
-    tz.TZDateTime scheduledDate = now.add(const Duration(minutes: 1));
+      tz.TZDateTime scheduledDate = tz.TZDateTime(
+        tz.local,
+        now.year,
+        now.month,
+        now.day,
+        hour,
+        minute,
+      );
 
       // If the scheduled time is in the past, schedule for tomorrow
       if (scheduledDate.isBefore(now)) {
         scheduledDate = scheduledDate.add(const Duration(days: 1));
       }
 
+      // Get localized strings
+      final strings = _getLocalizedStrings();
+
       // Android notification details
-      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+      final AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
         'daily_reminder', // Channel ID
-        'Günlük Hatırlatma', // Channel name
-        channelDescription: 'Her gün ruh halini kaydetmen için hatırlatma',
+        strings['channelName']!, // Channel name
+        channelDescription: strings['channelDesc']!,
         importance: Importance.high,
         priority: Priority.high,
         icon: '@mipmap/ic_launcher',
-        sound: RawResourceAndroidNotificationSound('notification_sound'),
+        sound: const RawResourceAndroidNotificationSound('notification_sound'),
         enableVibration: true,
         playSound: true,
       );
@@ -156,7 +207,7 @@ class NotificationService {
       );
 
       // Combined notification details
-      const NotificationDetails notificationDetails = NotificationDetails(
+      final NotificationDetails notificationDetails = NotificationDetails(
         android: androidDetails,
         iOS: iosDetails,
       );
@@ -164,17 +215,28 @@ class NotificationService {
       // Schedule the notification
       await _notifications.zonedSchedule(
         0, // Notification ID
-        'Bugün nasıl hissediyorsun? 🌙',
-        'Ruh halini kaydetme zamanı geldi!',
+        strings['notificationTitle']!,
+        strings['notificationBody']!,
         scheduledDate,
         notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time, // Repeat daily at same time
       );
 
       if (kDebugMode) {
-        print('📱 Daily reminder scheduled for $hour:00');
+        final minuteStr = minute.toString().padLeft(2, '0');
+        print('📱 Daily reminder scheduled for $hour:$minuteStr');
         print('   Next notification: $scheduledDate');
+        print('   Current time: ${tz.TZDateTime.now(tz.local)}');
+        print('   Timezone: ${tz.local.name}');
+
+        // Verify pending notifications
+        final pending = await _notifications.pendingNotificationRequests();
+        print('   Pending notifications: ${pending.length}');
+        for (var p in pending) {
+          print('   - ID: ${p.id}, Title: ${p.title}, Body: ${p.body}');
+        }
       }
 
       return const Success(null);
@@ -223,6 +285,9 @@ class NotificationService {
   /// Show immediate test notification
   Future<Result<void>> showTestNotification() async {
     try {
+      // Get localized strings
+      final strings = _getLocalizedStrings();
+
       const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
         'test_channel',
         'Test Notifications',
@@ -245,8 +310,8 @@ class NotificationService {
 
       await _notifications.show(
         999, // Test notification ID
-        'Test Bildirimi 🔔',
-        'Bildirimler çalışıyor!',
+        strings['testTitle']!,
+        strings['testBody']!,
         details,
       );
 
