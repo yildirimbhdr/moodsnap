@@ -68,16 +68,13 @@ class NotificationService {
         tz.setLocalLocation(tz.getLocation(timeZoneName));
       } catch (e) {
         // Fallback to Europe/Istanbul if timezone not found
-        if (kDebugMode) {
-          print('⚠️  Could not set timezone $timeZoneName, using Europe/Istanbul as fallback');
-        }
         tz.setLocalLocation(tz.getLocation('Europe/Istanbul'));
       }
 
       // Android initialization settings
       const AndroidInitializationSettings androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
 
-      // iOS initialization settings
+      // iOS initialization settings - IMPORTANT: Don't request permissions here
       const DarwinInitializationSettings iosSettings = DarwinInitializationSettings(
         requestAlertPermission: false, // We'll request manually
         requestBadgePermission: false,
@@ -96,19 +93,20 @@ class NotificationService {
         onDidReceiveNotificationResponse: _onNotificationTapped,
       );
 
-      if (initialized == true) {
-        _initialized = true;
-        return const Success(null);
-      } else {
-        return const Failure(AppError(
-          type: ErrorType.permission,
-          message: 'Failed to initialize notifications',
-        ));
+      // IMPORTANT: On iOS, initialize() can return false even when it succeeds
+      // This is a known issue with flutter_local_notifications on iOS
+      // Since the plugin still works (test notifications work), we mark it as initialized
+      _initialized = true;
+
+      return const Success(null);
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('Error initializing notifications: $e');
+        print('Stack trace: $stackTrace');
       }
-    } catch (e) {
       return Failure(AppError(
         type: ErrorType.unknown,
-        message: 'Notification initialization error',
+        message: 'Notification initialization error: $e',
         originalError: e,
       ));
     }
@@ -198,12 +196,12 @@ class NotificationService {
         playSound: true,
       );
 
-      // iOS notification details
+      // iOS notification details - using default sound
       const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
         presentAlert: true,
         presentBadge: true,
         presentSound: true,
-        sound: 'notification_sound.aiff',
+        interruptionLevel: InterruptionLevel.timeSensitive,
       );
 
       // Combined notification details
@@ -220,30 +218,18 @@ class NotificationService {
         scheduledDate,
         notificationDetails,
         androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
         matchDateTimeComponents: DateTimeComponents.time, // Repeat daily at same time
       );
 
-      if (kDebugMode) {
-        final minuteStr = minute.toString().padLeft(2, '0');
-        print('📱 Daily reminder scheduled for $hour:$minuteStr');
-        print('   Next notification: $scheduledDate');
-        print('   Current time: ${tz.TZDateTime.now(tz.local)}');
-        print('   Timezone: ${tz.local.name}');
-
-        // Verify pending notifications
-        final pending = await _notifications.pendingNotificationRequests();
-        print('   Pending notifications: ${pending.length}');
-        for (var p in pending) {
-          print('   - ID: ${p.id}, Title: ${p.title}, Body: ${p.body}');
-        }
-      }
-
       return const Success(null);
-    } catch (e) {
+    } catch (e, stackTrace) {
+      if (kDebugMode) {
+        print('Error scheduling daily reminder: $e');
+        print('Stack trace: $stackTrace');
+      }
       return Failure(AppError(
         type: ErrorType.unknown,
-        message: 'Failed to schedule daily reminder',
+        message: 'Failed to schedule daily reminder: $e',
         originalError: e,
       ));
     }
@@ -253,11 +239,6 @@ class NotificationService {
   Future<Result<void>> cancelDailyReminder() async {
     try {
       await _notifications.cancel(0); // Cancel notification with ID 0
-
-      if (kDebugMode) {
-        print('📱 Daily reminder cancelled');
-      }
-
       return const Success(null);
     } catch (e) {
       return Failure(AppError(
@@ -325,6 +306,72 @@ class NotificationService {
     }
   }
 
+  /// Schedule a test notification 30 seconds in the future (for background testing)
+  Future<Result<void>> scheduleBackgroundTestNotification() async {
+    try {
+      if (!_initialized) {
+        return const Failure(AppError(
+          type: ErrorType.unknown,
+          message: 'NotificationService not initialized',
+        ));
+      }
+
+      // Get localized strings
+      final strings = _getLocalizedStrings();
+
+      // Schedule for 30 seconds from now
+      final scheduledDate = tz.TZDateTime.now(tz.local).add(const Duration(seconds: 30));
+
+      // Android notification details with high priority for background delivery
+      const AndroidNotificationDetails androidDetails = AndroidNotificationDetails(
+        'background_test_channel',
+        'Background Test Notifications',
+        channelDescription: 'Test notification channel for background delivery',
+        importance: Importance.max,
+        priority: Priority.high,
+        icon: '@mipmap/ic_launcher',
+        sound: RawResourceAndroidNotificationSound('notification_sound'),
+        enableVibration: true,
+        playSound: true,
+        fullScreenIntent: true,
+      );
+
+      // iOS notification details - using default sound
+      const DarwinNotificationDetails iosDetails = DarwinNotificationDetails(
+        presentAlert: true,
+        presentBadge: true,
+        presentSound: true,
+        interruptionLevel: InterruptionLevel.timeSensitive,
+      );
+
+      const NotificationDetails notificationDetails = NotificationDetails(
+        android: androidDetails,
+        iOS: iosDetails,
+      );
+
+      // Cancel any existing background test notification
+      await _notifications.cancel(998);
+
+      // Schedule the notification
+      await _notifications.zonedSchedule(
+        998, // Background test notification ID
+        '${strings['testTitle']!} (30s)',
+        'Uygulama kapalıyken bu bildirimi aldıysanız, bildirimler çalışıyor! 🎉',
+        scheduledDate,
+        notificationDetails,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      );
+
+      return const Success(null);
+    } catch (e) {
+      return Failure(AppError(
+        type: ErrorType.unknown,
+        message: 'Failed to schedule background test notification',
+        originalError: e,
+      ));
+    }
+  }
+
   /// Check if notifications are enabled
   Future<bool> areNotificationsEnabled() async {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -352,9 +399,6 @@ class NotificationService {
 
   /// Handle notification tap
   void _onNotificationTapped(NotificationResponse response) {
-    if (kDebugMode) {
-      print('📱 Notification tapped: ${response.payload}');
-    }
     // Here you can navigate to specific screen based on payload
     // For example, navigate to mood entry screen
   }

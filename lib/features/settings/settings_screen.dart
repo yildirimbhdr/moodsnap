@@ -17,6 +17,24 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+  bool? _systemNotificationPermission;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkSystemPermission();
+  }
+
+  Future<void> _checkSystemPermission() async {
+    final notificationService = ref.read(notificationServiceProvider);
+    final hasPermission = await notificationService.areNotificationsEnabled();
+    if (mounted) {
+      setState(() {
+        _systemNotificationPermission = hasPermission;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final storage = ref.watch(storageServiceProvider);
@@ -74,10 +92,35 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
           _buildSection(
             title: l10n.notifications,
             children: [
+              // Show warning if system permission is denied
+              if (_systemNotificationPermission == false && !notificationsEnabled)
+                Container(
+                  margin: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: Colors.orange.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.orange.withOpacity(0.3)),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.warning_amber_rounded, color: Colors.orange),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Text(
+                          l10n.notificationPermissionDenied,
+                          style: const TextStyle(fontSize: 13),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               _buildSwitchTile(
                 icon: Icons.notifications_outlined,
                 title: l10n.dailyMoodReminder,
-                subtitle: l10n.everyDayNotificationSequence.replaceAll("{hour}", "${storage.getNotificationHour().toString().padLeft(2, '0')}:${storage.getNotificationMinute().toString().padLeft(2, '0')}"),
+                subtitle: _systemNotificationPermission == false && !notificationsEnabled
+                    ? l10n.notificationPermissionDenied
+                    : l10n.everyDayNotificationSequence.replaceAll("{hour}", "${storage.getNotificationHour().toString().padLeft(2, '0')}:${storage.getNotificationMinute().toString().padLeft(2, '0')}"),
                 value: notificationsEnabled,
                 onChanged: (value) async {
                   if (value) {
@@ -89,16 +132,34 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       storage.setNotificationsEnabled(true);
                       final hour = storage.getNotificationHour();
                       final minute = storage.getNotificationMinute();
-                      await notificationService.scheduleDailyReminder(hour, minute);
+                      final scheduleResult = await notificationService.scheduleDailyReminder(hour, minute);
+
+                      // Update system permission state
+                      _systemNotificationPermission = true;
+
                       if (mounted) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text(l10n.notificationEnabled.replaceAll('{title}', l10n.dailyMoodReminder)),
-                            backgroundColor: AppColors.primary,
-                          ),
-                        );
+                        if (scheduleResult.isSuccess) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text(l10n.notificationEnabled.replaceAll('{title}', l10n.dailyMoodReminder)),
+                              backgroundColor: AppColors.primary,
+                            ),
+                          );
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('HATA: ${scheduleResult.errorOrNull?.message ?? "Bilinmeyen hata"}'),
+                              backgroundColor: Colors.red,
+                              duration: const Duration(seconds: 5),
+                            ),
+                          );
+                          storage.setNotificationsEnabled(false);
+                        }
                       }
                     } else {
+                      // Permission denied
+                      _systemNotificationPermission = false;
+
                       if (mounted) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
@@ -125,23 +186,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () => _showNotificationTimePicker(context, l10n),
                 ),
-                _buildListTile(
-                  icon: Icons.notifications_active,
-                  title: l10n.sendTestNotification,
-                  subtitle: l10n.testNotificationDesc,
-                  onTap: () async {
-                    final notificationService = ref.read(notificationServiceProvider);
-                    final result = await notificationService.showTestNotification();
-                    if (mounted && result.isSuccess) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: Text(l10n.testNotificationSent),
-                          backgroundColor: AppColors.primary,
-                        ),
-                      );
-                    }
-                  },
-                ),
+             
                 _buildListTile(
                   icon: Icons.help_outline,
                   title: l10n.notificationsNotWorking,
@@ -154,7 +199,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const SizedBox(height: 16),
 
-          // Achievements Section
+          // Achievements SectionP
           _buildSection(
             title: l10n.achievements,
             children: [
@@ -435,6 +480,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   }
 
   void _showNotificationTimePicker(BuildContext context, l10n) async {
+    // Check if permission is granted first
+    if (_systemNotificationPermission == false) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Önce bildirim izni vermelisiniz!'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
     final storage = ref.read(storageServiceProvider);
     final currentHour = storage.getNotificationHour();
     final currentMinute = storage.getNotificationMinute();
@@ -468,20 +524,31 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       // Reschedule notification with new time
       if (storage.areNotificationsEnabled()) {
         final notificationService = ref.read(notificationServiceProvider);
-        await notificationService.scheduleDailyReminder(picked.hour, picked.minute);
+        final result = await notificationService.scheduleDailyReminder(picked.hour, picked.minute);
+
+        if (context.mounted) {
+          final timeStr = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
+
+          if (result.isSuccess) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.notificationTimeSet.replaceAll('{time}', timeStr)),
+                backgroundColor: AppColors.primary,
+              ),
+            );
+          } else {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('HATA: ${result.errorOrNull?.message ?? "Bilinmeyen hata"}'),
+                backgroundColor: Colors.red,
+                duration: const Duration(seconds: 5),
+              ),
+            );
+          }
+        }
       }
 
       setState(() {});
-
-      if (context.mounted) {
-        final timeStr = '${picked.hour.toString().padLeft(2, '0')}:${picked.minute.toString().padLeft(2, '0')}';
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(l10n.notificationTimeSet.replaceAll('{time}', timeStr)),
-            backgroundColor: AppColors.primary,
-          ),
-        );
-      }
     }
   }
 

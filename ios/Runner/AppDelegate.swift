@@ -7,9 +7,9 @@ import Flutter
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
-    // Request notification authorization
+    // Set flutter_local_notifications to handle presentation
     if #available(iOS 10.0, *) {
-      UNUserNotificationCenter.current().delegate = self as UNUserNotificationCenterDelegate
+      UNUserNotificationCenter.current().delegate = self as? UNUserNotificationCenterDelegate
     }
 
     GeneratedPluginRegistrant.register(with: self)

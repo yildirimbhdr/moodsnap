@@ -35,6 +35,10 @@ abstract class AppLocalizations {
   String get onboarding2Desc;
   String get onboarding3Title;
   String get onboarding3Desc;
+  String get onboarding4Title;
+  String get onboarding4Desc;
+  String get enableNotifications;
+  String get skipForNow;
   
   // Notification Permission
   String get notifPermissionTitle;
@@ -211,6 +215,9 @@ abstract class AppLocalizations {
   String get batteryOptimizationSettings;
   String get notificationTimeSet;
   String get notificationEnabled;
+  String get backgroundTestNotification;
+  String get backgroundTestNotificationDesc;
+  String get backgroundTestScheduled;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

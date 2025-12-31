@@ -47,6 +47,19 @@ class AppLocalizationsEN implements AppLocalizations {
       'Recognize emotional patterns and understand yourself better';
 
   @override
+  String get onboarding4Title => 'Daily reminders';
+
+  @override
+  String get onboarding4Desc =>
+      'Let us remind you every day! Don\'t forget to log your mood';
+
+  @override
+  String get enableNotifications => 'Enable Notifications';
+
+  @override
+  String get skipForNow => 'Skip for now';
+
+  @override
   String get notifPermissionTitle =>
       'Can we remind you every day?';
 
@@ -479,4 +492,13 @@ class AppLocalizationsEN implements AppLocalizations {
 
   @override
   String get notificationEnabled => "{title} enabled! 🔔";
+
+  @override
+  String get backgroundTestNotification => "Background Test (30 seconds)";
+
+  @override
+  String get backgroundTestNotificationDesc => "Close the app, notification will arrive in 30 seconds";
+
+  @override
+  String get backgroundTestScheduled => "Test notification scheduled! Now close the app and wait 30 seconds. 📱";
 }

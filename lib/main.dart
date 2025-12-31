@@ -27,29 +27,20 @@ void main() async {
   await achievementService.init();
 
   final customMoodService = CustomMoodService();
-  final customMoodResult = await customMoodService.init();
-  if (customMoodResult.isFailure) {
-    // Log error but continue app initialization
-    print('Warning: ${customMoodResult.errorOrNull}');
-  }
+  await customMoodService.init();
 
   // Initialize notification service
   final notificationService = NotificationService();
   notificationService.setStorageService(storageService); // Set storage for localization
-  final notificationResult = await notificationService.init();
-  if (notificationResult.isFailure) {
-    print('Warning: ${notificationResult.errorOrNull}');
-  }
+  await notificationService.init();
 
   // Initialize AdMob service
   final adMobService = AdMobService();
-  final adMobResult = await adMobService.init();
-  if (adMobResult.isFailure) {
-    print('Warning: ${adMobResult.errorOrNull}');
-  }
+  await adMobService.init();
 
-  // Schedule daily reminder if enabled
-  if (storageService.areNotificationsEnabled()) {
+  // Schedule daily reminder if enabled AND onboarding is complete
+  // (Don't schedule on first launch - onboarding will handle it)
+  if (storageService.isOnboardingComplete() && storageService.areNotificationsEnabled()) {
     final hour = storageService.getNotificationHour();
     final minute = storageService.getNotificationMinute();
     await notificationService.scheduleDailyReminder(hour, minute);

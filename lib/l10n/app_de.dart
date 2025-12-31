@@ -47,6 +47,19 @@ class AppLocalizationsDE implements AppLocalizations {
       'Erkenne emotionale Muster und lerne dich selbst besser kennen';
 
   @override
+  String get onboarding4Title => 'Tägliche Erinnerungen';
+
+  @override
+  String get onboarding4Desc =>
+      'Lass dich jeden Tag erinnern! Vergiss nicht, deine Stimmung zu protokollieren';
+
+  @override
+  String get enableNotifications => 'Benachrichtigungen aktivieren';
+
+  @override
+  String get skipForNow => 'Jetzt überspringen';
+
+  @override
   String get notifPermissionTitle => 'Dürfen wir dich täglich erinnern?';
 
   @override
@@ -475,4 +488,13 @@ class AppLocalizationsDE implements AppLocalizations {
 
   @override
   String get notificationEnabled => "{title} aktiviert! 🔔";
+
+  @override
+  String get backgroundTestNotification => "Hintergrund-Test (30 Sekunden)";
+
+  @override
+  String get backgroundTestNotificationDesc => "Schließen Sie die App, Benachrichtigung kommt in 30 Sekunden";
+
+  @override
+  String get backgroundTestScheduled => "Test-Benachrichtigung geplant! Schließen Sie jetzt die App und warten Sie 30 Sekunden. 📱";
 }

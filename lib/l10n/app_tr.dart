@@ -47,6 +47,19 @@ class AppLocalizationsTR implements AppLocalizations {
       'Duygusal desenleri fark et, kendini daha iyi tanı';
 
   @override
+  String get onboarding4Title => 'Günlük hatırlatma';
+
+  @override
+  String get onboarding4Desc =>
+      'Her gün seni hatırlatalım! Ruh halini kaydetmeyi unutma';
+
+  @override
+  String get enableNotifications => 'Bildirimleri Aç';
+
+  @override
+  String get skipForNow => 'Şimdilik geç';
+
+  @override
   String get notifPermissionTitle =>
       'Sana her gün hatırlatmamızı ister misin?';
 
@@ -479,4 +492,13 @@ class AppLocalizationsTR implements AppLocalizations {
 
   @override
   String get notificationEnabled => "{title} aktif edildi! 🔔";
+
+  @override
+  String get backgroundTestNotification => "Arka Plan Testi (30 saniye)";
+
+  @override
+  String get backgroundTestNotificationDesc => "Uygulamayı kapatın, 30 saniye sonra bildirim gelecek";
+
+  @override
+  String get backgroundTestScheduled => "Test bildirimi planlandı! Şimdi uygulamayı kapatın ve 30 saniye bekleyin. 📱";
 }

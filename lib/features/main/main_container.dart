@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:moodysnap/features/home/home_screen.dart';
 import '../../l10n/app_localizations.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/utils/result.dart';
+import '../../main.dart';
 import '../calendar/calendar_screen.dart';
 import '../settings/settings_screen.dart';
 
@@ -15,6 +17,100 @@ class MainContainer extends ConsumerStatefulWidget {
 
 class _MainContainerState extends ConsumerState<MainContainer> {
   int _currentIndex = 0;
+  bool _hasCheckedPermission = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Check notification permission after first frame
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkNotificationPermission();
+    });
+  }
+
+  Future<void> _checkNotificationPermission() async {
+    if (_hasCheckedPermission) return;
+    _hasCheckedPermission = true;
+
+    final storage = ref.read(storageServiceProvider);
+    final notificationService = ref.read(notificationServiceProvider);
+
+    // Check if notifications are enabled in settings
+    final notificationsEnabled = storage.areNotificationsEnabled();
+
+    if (notificationsEnabled) {
+      // Check actual system permission
+      final hasPermission = await notificationService.areNotificationsEnabled();
+
+      if (!hasPermission && mounted) {
+        // Permission not granted but user wants notifications
+        // Show dialog to request permission
+        _showNotificationPermissionDialog();
+      }
+    }
+  }
+
+  Future<void> _showNotificationPermissionDialog() async {
+    final l10n = AppLocalizations.of(context);
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: Text(l10n.notifPermissionTitle),
+        content: Text(l10n.onboarding4Desc),
+        actions: [
+          TextButton(
+            onPressed: () {
+              final storage = ref.read(storageServiceProvider);
+              storage.setNotificationsEnabled(false);
+              Navigator.pop(context);
+            },
+            child: Text(l10n.notifPermissionNo),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(context);
+
+              final notificationService = ref.read(notificationServiceProvider);
+              final storage = ref.read(storageServiceProvider);
+
+              final permissionResult = await notificationService.requestPermissions();
+
+              if (permissionResult.dataOrNull == true) {
+                // Permission granted - schedule notification
+                final hour = storage.getNotificationHour();
+                final minute = storage.getNotificationMinute();
+                await notificationService.scheduleDailyReminder(hour, minute);
+
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.notificationEnabled.replaceAll('{title}', l10n.dailyMoodReminder)),
+                      backgroundColor: AppColors.primary,
+                    ),
+                  );
+                }
+              } else {
+                // Permission denied
+                storage.setNotificationsEnabled(false);
+
+                if (mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text(l10n.notificationPermissionDenied),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
+            child: Text(l10n.notifPermissionYes),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _getCurrentScreen() {
     switch (_currentIndex) {

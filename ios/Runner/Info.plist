@@ -26,10 +26,17 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>UIBackgroundModes</key>
+	<array>
+		<string>fetch</string>
+		<string>remote-notification</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>MoodieSnap needs access to your camera to capture moments that represent your mood.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>MoodieSnap needs access to your photo library to save and retrieve mood photos.</string>
+	<key>NSUserNotificationsUsageDescription</key>
+	<string>MoodieSnap needs notification permission to remind you to log your daily mood.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>
