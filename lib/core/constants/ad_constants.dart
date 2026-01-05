@@ -9,12 +9,12 @@ class AdConstants {
   static String get bannerAdUnitId {
     if (Platform.isAndroid) {
       // Test banner ad unit for Android
-      return 'ca-app-pub-3940256099942544/6300978111';
+      return 'ca-app-pub-7806268665482970/9944903589';
       // Production: Replace with your real ad unit ID
       // return 'ca-app-pub-YOUR_PUBLISHER_ID/YOUR_AD_UNIT_ID';
     } else if (Platform.isIOS) {
       // Test banner ad unit for iOS
-      return 'ca-app-pub-3940256099942544/2934735716';
+      return 'ca-app-pub-7806268665482970/8133467776';
       // Production: Replace with your real ad unit ID
       // return 'ca-app-pub-YOUR_PUBLISHER_ID/YOUR_AD_UNIT_ID';
     } else {
