@@ -8,6 +8,7 @@ import 'package:moodysnap/services/achievement_service.dart';
 import 'package:moodysnap/services/custom_mood_service.dart';
 import 'package:moodysnap/services/notification_service.dart';
 import 'package:moodysnap/services/admob_service.dart';
+import 'package:moodysnap/services/analytics_service.dart';
 import 'package:moodysnap/core/utils/result.dart';
 import 'app.dart';
 
@@ -37,6 +38,10 @@ void main() async {
   // Initialize AdMob service
   final adMobService = AdMobService();
   await adMobService.init();
+
+  // Initialize Analytics service
+  final analyticsService = AnalyticsService();
+  await analyticsService.init();
 
   // Schedule daily reminder if enabled AND onboarding is complete
   // (Don't schedule on first launch - onboarding will handle it)
@@ -68,6 +73,7 @@ void main() async {
         customMoodServiceProvider.overrideWithValue(customMoodService),
         notificationServiceProvider.overrideWithValue(notificationService),
         adMobServiceProvider.overrideWithValue(adMobService),
+        analyticsServiceProvider.overrideWithValue(analyticsService),
       ],
       child: const MoodSnapApp(),
     ),
@@ -92,4 +98,8 @@ final notificationServiceProvider = Provider<NotificationService>((ref) {
 
 final adMobServiceProvider = Provider<AdMobService>((ref) {
   throw UnimplementedError('AdMobService must be overridden');
+});
+
+final analyticsServiceProvider = Provider<AnalyticsService>((ref) {
+  throw UnimplementedError('AnalyticsService must be overridden');
 });

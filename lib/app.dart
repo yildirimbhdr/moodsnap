@@ -13,6 +13,7 @@ class MoodSnapApp extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final storageService = ref.watch(storageServiceProvider);
+    final analyticsService = ref.watch(analyticsServiceProvider);
     final languageCode = ref.watch(languageProvider);
 
     return MaterialApp(
@@ -27,6 +28,9 @@ class MoodSnapApp extends ConsumerWidget {
         GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: AppLocalizations.supportedLocales,
+      navigatorObservers: [
+        if (analyticsService.observer != null) analyticsService.observer!,
+      ],
       home: storageService.isOnboardingComplete()
           ? const MainContainer()
           : const OnboardingScreen(),

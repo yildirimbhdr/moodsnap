@@ -1,3 +1,4 @@
+import 'dart:ui' as ui;
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:moodysnap/data/models/mood_entry.dart';
 import '../../data/models/custom_mood.dart';
@@ -111,7 +112,22 @@ class StorageService {
   }
 
   String getLanguage() {
-    return _settingsBox.get('language', defaultValue: 'en');
+    // Check if a language has been explicitly set by the user
+    final savedLanguage = _settingsBox.get('language');
+    if (savedLanguage != null) {
+      return savedLanguage;
+    }
+
+    // If no language is saved, detect from device locale
+    final deviceLocale = ui.PlatformDispatcher.instance.locale.languageCode;
+
+    // Check if the device locale is supported, otherwise default to 'en'
+    const supportedLanguages = ['en', 'tr'];
+    if (supportedLanguages.contains(deviceLocale)) {
+      return deviceLocale;
+    }
+
+    return 'en';
   }
 
   Future<void> setNotificationTime(int hour, int minute) async {
