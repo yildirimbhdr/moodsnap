@@ -1,0 +1,12 @@
+/*
+  InfoPlist.strings
+  Runner
+
+  Created by localization.
+*/
+
+CFBundleDisplayName = "Stimmungstagebuch";
+CFBundleName = "Stimmungstagebuch";
+NSCameraUsageDescription = "Stimmungstagebuch benötigt Zugriff auf Ihre Kamera, um Momente zu erfassen, die Ihre Stimmung repräsentieren.";
+NSPhotoLibraryUsageDescription = "Stimmungstagebuch benötigt Zugriff auf Ihre Fotobibliothek, um Stimmungsfotos zu speichern und abzurufen.";
+NSUserNotificationsUsageDescription = "Stimmungstagebuch benötigt die Benachrichtigungsberechtigung, um Sie daran zu erinnern, Ihre tägliche Stimmung zu protokollieren.";

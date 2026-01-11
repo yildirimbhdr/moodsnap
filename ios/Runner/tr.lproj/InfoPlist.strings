@@ -1,0 +1,12 @@
+/*
+  InfoPlist.strings
+  Runner
+
+  Created by localization.
+*/
+
+CFBundleDisplayName = "Ruh Hal Günlüğü";
+CFBundleName = "Ruh Hal Günlüğü";
+NSCameraUsageDescription = "Ruh Hal Günlüğü, ruh halinizi temsil eden anları yakalamak için kameranıza erişime ihtiyaç duyar.";
+NSPhotoLibraryUsageDescription = "Ruh Hal Günlüğü, ruh hali fotoğraflarını kaydetmek ve almak için fotoğraf galerinize erişime ihtiyaç duyar.";
+NSUserNotificationsUsageDescription = "Ruh Hal Günlüğü, günlük ruh halinizi kaydetmenizi hatırlatmak için bildirim iznine ihtiyaç duyar.";

@@ -285,19 +285,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
 
           const SizedBox(height: 32),
 
-          const Center(
+          Center(
             child: Column(
               children: [
                 Text(
-                  'MoodieSnap',
-                  style: TextStyle(
+                  l10n.appName,
+                  style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
                     color: AppColors.textSecondary,
                   ),
                 ),
-                SizedBox(height: 4),
-                Text(
+                const SizedBox(height: 4),
+                const Text(
                   'Version 0.1.0',
                   style: TextStyle(fontSize: 12, color: AppColors.textHint),
                 ),

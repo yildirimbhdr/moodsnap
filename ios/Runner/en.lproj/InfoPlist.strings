@@ -1,0 +1,12 @@
+/*
+  InfoPlist.strings
+  Runner
+
+  Created by localization.
+*/
+
+CFBundleDisplayName = "Mood Diaryz";
+CFBundleName = "Mood Diaryz";
+NSCameraUsageDescription = "Mood Diaryz needs access to your camera to capture moments that represent your mood.";
+NSPhotoLibraryUsageDescription = "Mood Diaryz needs access to your photo library to save and retrieve mood photos.";
+NSUserNotificationsUsageDescription = "Mood Diaryz needs notification permission to remind you to log your daily mood.";
